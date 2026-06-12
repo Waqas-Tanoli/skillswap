@@ -4,42 +4,89 @@ export interface IUser extends Document {
   username: string;
   email: string;
   password: string;
+
   bio?: string;
   location?: string;
+  avatar?: string;
+
   skillsToTeach: string[];
   skillsToLearn: string[];
-  avatar?: string;
+
   trustScore: number;
+
   role: "user" | "admin";
+
   isVerified: boolean;
+
   createdAt: Date;
   updatedAt: Date;
 }
 
 const userSchema = new Schema<IUser>(
   {
-    username: { type: String, required: true, trim: true },
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-    email: { type: String, required: true, unique: true, lowercase: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
 
-    password: { type: String, required: true, minlength: 6 },
+    password: {
+      type: String,
+      required: true,
+    },
 
-    bio: { type: String, default: "" },
+    bio: {
+      type: String,
+      default: "",
+    },
 
-    location: { type: String, default: "" },
+    location: {
+      type: String,
+      default: "",
+    },
 
-    skillsToTeach: [{ type: String }],
-    skillsToLearn: [{ type: String }],
+    avatar: {
+      type: String,
+      default: "",
+    },
 
-    avatar: { type: String },
+    skillsToTeach: {
+      type: [String],
+      default: [],
+    },
 
-    trustScore: { type: Number, default: 0 },
+    skillsToLearn: {
+      type: [String],
+      default: [],
+    },
 
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    trustScore: {
+      type: Number,
+      default: 0,
+    },
 
-    isVerified: { type: Boolean, default: false },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  }
 );
 
 export default mongoose.model<IUser>("User", userSchema);
