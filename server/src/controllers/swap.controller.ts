@@ -1,10 +1,19 @@
 import swapRequest from "../models/swapRequest";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { Response } from "express";
 
-//send swap request
-export const sendSwapRequest = async (req: AuthRequest, res: any) => {
+// Send Swap Request
+export const sendSwapRequest = async (
+  req: AuthRequest,
+  res: Response
+) => {
   const senderId = req.user?.id;
-  const { receiver, skillOffered, skillRequested, message } = req.body;
+  const {
+    receiver,
+    skillOffered,
+    skillRequested,
+    message,
+  } = req.body;
 
   if (senderId === receiver) {
     return res.status(400).json({
@@ -13,7 +22,6 @@ export const sendSwapRequest = async (req: AuthRequest, res: any) => {
     });
   }
 
-  // prevent duplicate pending request
   const existing = await swapRequest.findOne({
     sender: senderId,
     receiver,
@@ -42,9 +50,11 @@ export const sendSwapRequest = async (req: AuthRequest, res: any) => {
   });
 };
 
-
-//Accept swap request
-export const acceptSwapRequest = async (req: any, res: any) => {
+// Accept Swap Request
+export const acceptSwapRequest = async (
+  req: AuthRequest,
+  res: Response
+) => {
   const { id } = req.params;
 
   const swap = await swapRequest.findById(id);
@@ -53,6 +63,22 @@ export const acceptSwapRequest = async (req: any, res: any) => {
     return res.status(404).json({
       success: false,
       message: "Swap request not found",
+    });
+  }
+
+  // only receiver can accept
+  if (swap.receiver.toString() !== req.user?.id) {
+    return res.status(403).json({
+      success: false,
+      message: "Only receiver can accept this request",
+    });
+  }
+
+  // must be pending
+  if (swap.status !== "pending") {
+    return res.status(400).json({
+      success: false,
+      message: "Swap request is no longer pending",
     });
   }
 
@@ -66,8 +92,11 @@ export const acceptSwapRequest = async (req: any, res: any) => {
   });
 };
 
-//Reject Swap Request
-export const rejectSwapRequest = async (req: any, res: any) => {
+// Reject Swap Request
+export const rejectSwapRequest = async (
+  req: AuthRequest,
+  res: Response
+) => {
   const { id } = req.params;
 
   const swap = await swapRequest.findById(id);
@@ -77,7 +106,21 @@ export const rejectSwapRequest = async (req: any, res: any) => {
       success: false,
       message: "Swap request not found",
     });
-  } 
+  }
+
+  if (swap.receiver.toString() !== req.user?.id) {
+    return res.status(403).json({
+      success: false,
+      message: "Only receiver can reject this request",
+    });
+  }
+
+  if (swap.status !== "pending") {
+    return res.status(400).json({
+      success: false,
+      message: "Swap request is no longer pending",
+    });
+  }
 
   swap.status = "rejected";
   await swap.save();
@@ -89,8 +132,11 @@ export const rejectSwapRequest = async (req: any, res: any) => {
   });
 };
 
-//Mark Completed 
-export const completeSwapRequest = async (req: any, res: any) => {
+// Mark Swap as Completed
+export const completeSwapRequest = async (
+  req: AuthRequest,
+  res: Response
+) => {
   const { id } = req.params;
 
   const swap = await swapRequest.findById(id);
@@ -99,6 +145,24 @@ export const completeSwapRequest = async (req: any, res: any) => {
     return res.status(404).json({
       success: false,
       message: "Swap request not found",
+    });
+  }
+
+  const isParticipant =
+    swap.sender.toString() === req.user?.id ||
+    swap.receiver.toString() === req.user?.id;
+
+  if (!isParticipant) {
+    return res.status(403).json({
+      success: false,
+      message: "Unauthorized",
+    });
+  }
+
+  if (swap.status !== "accepted") {
+    return res.status(400).json({
+      success: false,
+      message: "Only accepted swaps can be completed",
     });
   }
 
@@ -112,14 +176,21 @@ export const completeSwapRequest = async (req: any, res: any) => {
   });
 };
 
-//get user swaps
-export const getUserSwaps = async (req: any, res: any) => {
+// Get all swaps for a user
+export const getUserSwaps = async (
+  req: AuthRequest,
+  res: Response
+) => {
   const userId = req.user?.id;
 
-  const swaps = await swapRequest.find({
-    $or: [{ sender: userId }, { receiver: userId }],
-  })
-    .populate("sender receiver", "name email avatar")
+  const swaps = await swapRequest
+    .find({
+      $or: [{ sender: userId }, { receiver: userId }],
+    })
+    .populate("sender", "name email avatar trustScore")
+    .populate("receiver", "name email avatar trustScore")
+    .populate("skillOffered", "name category")
+    .populate("skillRequested", "name category")
     .sort({ createdAt: -1 });
 
   return res.status(200).json({
