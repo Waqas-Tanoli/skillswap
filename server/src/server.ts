@@ -7,6 +7,8 @@ import authRoutes from "./routes/auth.route";
 import userRoutes from "./routes/user.route";
 import swapRoutes from "./routes/swap.routes";
 import matchRoutes from "./routes/match.route";
+import skillRoutes from "./routes/skills.route";
+import {seedSkills} from "./utils/seedSkills";
 
 const PORT = process.env.PORT || 5000;
 
@@ -14,10 +16,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/swaps", swapRoutes);
 app.use("/api/matches", matchRoutes);
+app.use("/api/skills", skillRoutes);
 
 const startServer = async () => {
   try {
     await dbConnect();
+    await seedSkills();
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
