@@ -1,27 +1,53 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IRating extends Document {
-  from: Types.ObjectId;
-  to: Types.ObjectId;
-  swapRequest: Types.ObjectId;
+  swap: Types.ObjectId;
+  rater: Types.ObjectId;
+  ratedUser: Types.ObjectId;
 
-  rating: number;
+  rating: number; 
   review?: string;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const ratingSchema = new Schema<IRating>(
+const RatingSchema = new Schema<IRating>(
   {
-    from: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    swap: {
+      type: Schema.Types.ObjectId,
+      ref: "SwapRequest",
+      required: true,
+    },
 
-    to: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    rater: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
 
-    swapRequest: { type: Schema.Types.ObjectId, ref: "SwapRequest" },
+    ratedUser: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
 
-    rating: { type: Number, required: true, min: 1, max: 5 },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
 
-    review: { type: String, default: "" },
+    review: {
+      type: String,
+      default: "",
+    },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-export default mongoose.model<IRating>("Rating", ratingSchema);
+// Prevent duplicate rating per swap per user
+RatingSchema.index({ swap: 1, rater: 1 }, { unique: true });
+
+export default mongoose.model<IRating>("Rating", RatingSchema);

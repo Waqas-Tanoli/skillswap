@@ -12,15 +12,18 @@ import matchRoutes from "./routes/match.route";
 import skillRoutes from "./routes/skills.route";
 import {seedSkills} from "./utils/seedSkills";
 import chatRoutes from "./routes/chat.route";
+import ratingRoutes from "./routes/rating.route";
 
 const PORT = process.env.PORT || 5000;
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/chats", chatRoutes);
 app.use("/api/swaps", swapRoutes);
 app.use("/api/matches", matchRoutes);
 app.use("/api/skills", skillRoutes);
+app.use("/api/chats", chatRoutes);
+app.use("/api/ratings", ratingRoutes);
+
 
 const server = http.createServer(app);
 initSocket(server);
