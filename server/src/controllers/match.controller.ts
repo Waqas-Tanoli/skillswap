@@ -5,9 +5,9 @@ export const getMatches = async (
   req: AuthRequest,
   res: any
 ) => {
-  const currentUser = await User.findById(
-    req.user?.id
-  );
+  const currentUser = await User.findById(req.user?.id)
+    .populate("skillsToTeach.skill", "name category")
+    .populate("skillsToLearn.skill", "name category");
 
   if (!currentUser) {
     return res.status(404).json({
@@ -18,21 +18,32 @@ export const getMatches = async (
 
   const users = await User.find({
     _id: { $ne: currentUser._id },
-  }).select("-password");
+  })
+    .populate("skillsToTeach.skill", "name category")
+    .populate("skillsToLearn.skill", "name category")
+    .select("-password");
+
+  const currentTeachSkillIds = currentUser.skillsToTeach.map(
+    (item) => item.skill._id.toString()
+  );
+
+  const currentLearnSkillIds = currentUser.skillsToLearn.map(
+    (item) => item.skill._id.toString()
+  );
 
   const matches = users
     .map((user) => {
-      const teachMatch = currentUser.skillsToLearn.filter(
-        (skill) =>
-          user.skillsToTeach.includes(skill)
+      const teachMatch = user.skillsToTeach.filter((item) =>
+        currentLearnSkillIds.includes(item.skill._id.toString())
       );
 
-      const learnMatch = currentUser.skillsToTeach.filter(
-        (skill) =>
-          user.skillsToLearn.includes(skill)
+      const learnMatch = user.skillsToLearn.filter((item) =>
+        currentTeachSkillIds.includes(item.skill._id.toString())
       );
 
-      const score = teachMatch.length * 2 + learnMatch.length * 2;
+      const score =
+        teachMatch.length * 2 +
+        learnMatch.length * 2;
 
       return {
         user,

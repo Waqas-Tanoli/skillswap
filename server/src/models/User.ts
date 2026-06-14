@@ -1,5 +1,9 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document,Types } from "mongoose";
 
+export interface IUserSkill {
+  skill: Types.ObjectId;
+  level: "beginner" | "intermediate" | "advanced";
+}
 export interface IUser extends Document {
   username: string;
   email: string;
@@ -9,9 +13,8 @@ export interface IUser extends Document {
   location?: string;
   avatar?: string;
 
-  skillsToTeach: string[];
-  skillsToLearn: string[];
-
+  skillsToTeach:IUserSkill[];
+  skillsToLearn:IUserSkill[];
   trustScore: number;
 
   role: "user" | "admin";
@@ -58,15 +61,37 @@ const userSchema = new Schema<IUser>(
       default: "",
     },
 
-    skillsToTeach: {
-      type: [String],
-      default: [],
+    skillsToTeach: [
+  {
+    skill: {
+      type: Schema.Types.ObjectId,
+      ref: "Skill",
+      required: true,
     },
 
-    skillsToLearn: {
-      type: [String],
-      default: [],
+    level: {
+      type: String,
+      enum: ["beginner", "intermediate", "advanced"],
+      required: true,
     },
+  },
+],
+
+  skillsToLearn: [
+  {
+    skill: {
+      type: Schema.Types.ObjectId,
+      ref: "Skill",
+      required: true,
+    },
+
+    level: {
+      type: String,
+      enum: ["beginner", "intermediate", "advanced"],
+      required: true,
+    },
+  },
+],
 
     trustScore: {
       type: Number,
