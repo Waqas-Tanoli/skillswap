@@ -1,26 +1,42 @@
+
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IMessage extends Document {
+  swap: Types.ObjectId;
   sender: Types.ObjectId;
   receiver: Types.ObjectId;
-  swapRequest: Types.ObjectId;
-  content: string;
-  read: boolean;
+  message: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const messageSchema = new Schema<IMessage>(
+const MessageSchema = new Schema<IMessage>(
   {
-    sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    swap: {
+      type: Schema.Types.ObjectId,
+      ref: "SwapRequest",
+      required: true,
+    },
 
-    receiver: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    sender: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
 
-    swapRequest: { type: Schema.Types.ObjectId, ref: "SwapRequest" },
+    receiver: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
 
-    content: { type: String, required: true },
-
-    read: { type: Boolean, default: false },
+    message: {
+      type: String,
+      required: true,
+      trim: true,
+    },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-export default mongoose.model<IMessage>("Message", messageSchema);
+export default mongoose.model<IMessage>("Message", MessageSchema);
