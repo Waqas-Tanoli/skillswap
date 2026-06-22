@@ -15,6 +15,7 @@ import chatRoutes from "./routes/chat.route";
 import ratingRoutes from "./routes/rating.route";
 import notificationRoutes from "./routes/notification.route"; 
 import dashboardRoutes from "./routes/dashboard.route";
+import adminRoutes from "./routes/admin.route";
 
 const PORT = process.env.PORT || 5000;
 
@@ -27,6 +28,7 @@ app.use("/api/chats", chatRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 const server = http.createServer(app);

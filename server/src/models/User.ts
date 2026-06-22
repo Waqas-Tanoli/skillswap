@@ -20,6 +20,7 @@ export interface IUser extends Document {
   role: "user" | "admin";
 
   isVerified: boolean;
+  isBanned: boolean;
 
   createdAt: Date;
   updatedAt: Date;
@@ -105,6 +106,11 @@ const userSchema = new Schema<IUser>(
     },
 
     isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    isBanned: {
       type: Boolean,
       default: false,
     },
