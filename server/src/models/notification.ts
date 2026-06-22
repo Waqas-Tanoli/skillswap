@@ -1,33 +1,71 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface INotification extends Document {
-  user: Types.ObjectId;
+  recipient: Types.ObjectId;
+  sender?: Types.ObjectId;
 
-  type: "message" | "swap_request" | "rating" | "system";
+  type:
+    | "swap_request"
+    | "swap_accepted"
+    | "swap_rejected"
+    | "swap_completed"
+    | "message"
+    | "rating";
 
-  content: string;
+  title: string;
+  message: string;
 
-  read: boolean;
+  isRead: boolean;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const notificationSchema = new Schema<INotification>(
+const NotificationSchema = new Schema<INotification>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-
-    type: {
-      type: String,
-      enum: ["message", "swap_request", "rating", "system"],
+    recipient: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
 
-    content: { type: String, required: true },
+    sender: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
 
-    read: { type: Boolean, default: false },
+    type: {
+      type: String,
+      enum: [
+        "swap_request",
+        "swap_accepted",
+        "swap_rejected",
+        "swap_completed",
+        "message",
+        "rating",
+      ],
+      required: true,
+    },
+
+    title: {
+      type: String,
+      required: true,
+    },
+
+    message: {
+      type: String,
+      required: true,
+    },
+
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
 export default mongoose.model<INotification>(
   "Notification",
-  notificationSchema
+  NotificationSchema
 );

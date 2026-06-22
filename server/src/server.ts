@@ -13,7 +13,7 @@ import skillRoutes from "./routes/skills.route";
 import {seedSkills} from "./utils/seedSkills";
 import chatRoutes from "./routes/chat.route";
 import ratingRoutes from "./routes/rating.route";
-
+import notificationRoutes from "./routes/notification.route";
 const PORT = process.env.PORT || 5000;
 
 app.use("/api/auth", authRoutes);
@@ -23,6 +23,7 @@ app.use("/api/matches", matchRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/ratings", ratingRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 
 const server = http.createServer(app);
@@ -34,7 +35,7 @@ const startServer = async () => {
     await dbConnect();
     await seedSkills();
 
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {

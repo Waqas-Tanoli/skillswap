@@ -3,6 +3,7 @@ import SwapRequest from "../models/swapRequest";
 import User from "../models/User";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { updateTrustScore } from "../utils/trustScore";
+import { createNotification } from "../utils/createNotification";
 
 export const createRating = async (
   req: AuthRequest,
@@ -48,6 +49,16 @@ export const createRating = async (
   });
 
   await updateTrustScore(ratedUser);
+  await createNotification({
+  recipient: ratedUser,
+  sender: raterId,
+
+  type: "rating",
+
+  title: "New Review",
+
+  message: "You received a new review.",
+});
 
   return res.status(201).json({
     success: true,

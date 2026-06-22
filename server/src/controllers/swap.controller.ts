@@ -1,6 +1,7 @@
 import swapRequest from "../models/swapRequest";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { Response } from "express";
+import { createNotification } from "../utils/createNotification";
 
 // Send Swap Request
 export const sendSwapRequest = async (
@@ -42,12 +43,22 @@ export const sendSwapRequest = async (
     skillRequested,
     message,
   });
+   await createNotification({
+    recipient: receiver,
+    sender: senderId,
+    type: "swap_request",
+    title: "New Swap Request",
+    message: `You have a new swap request from ${req.user?.username}`,
+  });
 
   return res.status(201).json({
     success: true,
     message: "Swap request sent",
     data: swap,
   });
+
+ 
+
 };
 
 // Accept Swap Request
@@ -55,6 +66,7 @@ export const acceptSwapRequest = async (
   req: AuthRequest,
   res: Response
 ) => {
+
   const { id } = req.params;
 
   const swap = await swapRequest.findById(id);
@@ -84,6 +96,17 @@ export const acceptSwapRequest = async (
 
   swap.status = "accepted";
   await swap.save();
+
+  await createNotification({
+  recipient: swap.sender.toString(),
+  sender: req.user?.id,
+
+  type: "swap_accepted",
+
+  title: "Swap Accepted",
+
+  message: "Your swap request was accepted.",
+});
 
   return res.status(200).json({
     success: true,
@@ -124,6 +147,16 @@ export const rejectSwapRequest = async (
 
   swap.status = "rejected";
   await swap.save();
+  await createNotification({
+  recipient: swap.sender.toString(),
+  sender: req.user?.id,
+
+  type: "swap_rejected",
+
+  title: "Swap Rejected",
+
+  message: "Your swap request was rejected.",
+});
 
   return res.status(200).json({
     success: true,

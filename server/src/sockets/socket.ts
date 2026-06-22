@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import http from "http";
 import jwt from "jsonwebtoken";
 import Message from "../models/message";
+import { createNotification } from "../utils/createNotification";
 
 export const initSocket = (server: http.Server) => {
   const io = new Server(server, {
@@ -41,20 +42,34 @@ export const initSocket = (server: http.Server) => {
     });
 
     // Handle sending messages
-    socket.on("send_message", async (data) => {
-      const { swapId, receiverId, message } = data;
+   socket.on("send_message", async (data) => {
+  try {
+    const { swapId, receiverId, message } = data;
 
-      const senderId = socket.data.user.id;
+    const senderId = socket.data.user.id;
 
-      const msg = await Message.create({
-        swap: swapId,
-        sender: senderId,
-        receiver: receiverId,
-        message,
-      });
-
-      io.to(swapId).emit("receive_message", msg);
+    const msg = await Message.create({
+      swap: swapId,
+      sender: senderId,
+      receiver: receiverId,
+      message,
     });
+
+    await createNotification({
+      recipient: receiverId,
+      sender: senderId,
+      type: "message",
+      title: "New Message",
+      message: "You received a new message.",
+    });
+
+    io.to(swapId).emit("receive_message", msg);
+  } catch (error) {
+    socket.emit("message_error", {
+      message: "Failed to send message",
+    });
+  }
+});
 
     socket.on("disconnect", () => {
       console.log("User disconnected");
