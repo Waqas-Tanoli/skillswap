@@ -13,7 +13,9 @@ import skillRoutes from "./routes/skills.route";
 import {seedSkills} from "./utils/seedSkills";
 import chatRoutes from "./routes/chat.route";
 import ratingRoutes from "./routes/rating.route";
-import notificationRoutes from "./routes/notification.route";
+import notificationRoutes from "./routes/notification.route"; 
+import dashboardRoutes from "./routes/dashboard.route";
+
 const PORT = process.env.PORT || 5000;
 
 app.use("/api/auth", authRoutes);
@@ -24,6 +26,7 @@ app.use("/api/skills", skillRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 
 const server = http.createServer(app);
