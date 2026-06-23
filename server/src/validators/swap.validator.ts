@@ -10,8 +10,7 @@ import {validate} from "../middleware/validate";
 // });
 
 export const createSwapSchema = z.object({
-  sender: z.string().uuid(),
-  receiver: z.string().uuid(),
+  receiver: z.string().min(1, "Receiver ID is required"),
   skillOffered: z.string().min(2).max(50),
   skillRequested: z.string().min(2).max(50),
   message: z.string().max(1000).optional(),

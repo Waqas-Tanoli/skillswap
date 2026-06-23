@@ -18,9 +18,7 @@ import {
 
 const router = Router();
 
-/**
- * USER MANAGEMENT
- */
+//Admin dashboard routes
 router.get(
   "/users",
   authMiddleware,
@@ -35,9 +33,7 @@ router.patch(
   toggleBanUser
 );
 
-/**
- * PLATFORM ANALYTICS
- */
+//Platform analytics (admin only)
 router.get(
   "/analytics",
   authMiddleware,
@@ -45,9 +41,7 @@ router.get(
   getPlatformAnalytics
 );
 
-/**
- * MODERATION
- */
+//Delete a swap request (admin only)
 router.delete(
   "/swap/:id",
   authMiddleware,

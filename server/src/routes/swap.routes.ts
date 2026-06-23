@@ -24,3 +24,36 @@ router.patch("/:id/reject", authMiddleware, rejectSwapRequest);
 router.patch("/:id/complete", authMiddleware, completeSwapRequest);
 
 export default router;
+
+
+/**
+ * @openapi
+ * /swaps/send:
+ *   post:
+ *     tags:
+ *       - Swaps
+ *     summary: Send a swap request
+ *   
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - receiver
+ *               - skillOffered
+ *               - skillRequested
+ *             properties:
+ *               receiver:
+ *                 type: string
+ *               skillOffered:
+ *                 type: string
+ *               skillRequested:
+ *                 type: string
+ *               message:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Swap request sent
+ */
