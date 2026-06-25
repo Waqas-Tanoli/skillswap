@@ -18,6 +18,7 @@ export default function AppRoutes() {
       {/* AUTH */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      
 
       {/* USER APP
       <Route

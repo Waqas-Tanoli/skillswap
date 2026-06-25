@@ -88,7 +88,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col lg:flex-row">
       {/* LEFT SIDE - Brand Section */}
-      <div className="lg:w-1/2 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 lg:p-16 flex flex-col justify-between min-h-[300px] lg:min-h-screen relative overflow-hidden">
+      <div className="lg:w-1/2 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 p-8 lg:p-16 flex flex-col justify-between min-h-75 lg:min-h-screen relative overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500 rounded-full blur-3xl" />
@@ -123,7 +123,7 @@ export default function RegisterPage() {
               <br />
               learning journey
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-400">
                 today
               </span>
             </h1>
@@ -136,7 +136,7 @@ export default function RegisterPage() {
           <div className="hidden lg:block mt-12 space-y-4">
             {features.map((feature, index) => (
               <div key={index} className="flex items-center gap-3 text-slate-300">
-                <feature.icon className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                <feature.icon className="h-5 w-5 text-blue-400 shrink-0" />
                 <span>{feature.text}</span>
               </div>
             ))}
@@ -176,7 +176,7 @@ export default function RegisterPage() {
           <div className="grid grid-cols-1 gap-2">
             {features.map((feature, index) => (
               <div key={index} className="flex items-center gap-2 text-sm text-slate-300">
-                <feature.icon className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                <feature.icon className="h-4 w-4 text-blue-400 shrink-0" />
                 <span>{feature.text}</span>
               </div>
             ))}
