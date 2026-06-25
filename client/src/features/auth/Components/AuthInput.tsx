@@ -1,34 +1,58 @@
-import type { UseFormRegister, FieldValues, Path } from "react-hook-form";
+import React from "react";
+import type { UseFormRegister } from "react-hook-form";
+import  type { RegisterForm } from "../types/auth.types";
 
-type Props<T extends FieldValues> = {
+interface AuthInputProps {
   label: string;
+  name: keyof RegisterForm;
   type?: string;
-  register: UseFormRegister<T>;
-  name: Path<T>;
+  register: UseFormRegister<RegisterForm>;
   error?: string;
-};
+  icon?: React.ReactNode;
+  placeholder?: string;
+}
 
-export default function AuthInput<T extends FieldValues>({
+export default function AuthInput({
   label,
+  name,
   type = "text",
   register,
-  name,
   error,
-}: Props<T>) {
+  icon,
+  placeholder,
+}: AuthInputProps) {
   return (
-    <div className="mb-4">
-      <label className="block mb-1 text-sm font-medium">
+    <div className="space-y-1.5">
+      <label className="block text-sm font-medium text-slate-700">
         {label}
       </label>
-
-      <input
-        type={type}
-        {...register(name)}
-        className="w-full p-2 border rounded"
-      />
-
+      <div className="relative">
+        {icon && (
+          <div className="absolute left-3 top-1/2 -translate-y-1/2">
+            {icon}
+          </div>
+        )}
+        <input
+          type={type}
+          {...register(name)}
+          placeholder={placeholder}
+          className={`
+            w-full px-4 py-3 rounded-xl border transition-all duration-200
+            ${icon ? "pl-10" : ""}
+            ${error
+              ? "border-red-300 focus:border-red-500 focus:ring-red-500/20 bg-red-50/50"
+              : "border-slate-200 focus:border-slate-400 focus:ring-slate-200 hover:border-slate-300"
+            }
+            focus:outline-none focus:ring-4 bg-white
+            placeholder:text-slate-400 text-slate-700
+          `}
+        />
+      </div>
       {error && (
-        <p className="text-red-500 text-sm">{error}</p>
+        <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+          <span className="inline-block w-1 h-1 bg-red-500 rounded-full" />
+          {error}
+        </p>
       )}
     </div>
   );
