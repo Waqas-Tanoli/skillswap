@@ -1,9 +1,21 @@
+import { useEffect } from "react";
+
+import AppRoutes from "./routes/AppRoutes";
+
+import { useAuthStore } from "./store/authStore";
+
 function App() {
-  return (
-    <>
-      <h1 className="text-red-800">Skill Swap</h1>
-    </>
-  );
+  const initializeAuth =
+    useAuthStore(
+      (state) =>
+        state.initializeAuth
+    );
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
+  return <AppRoutes />;
 }
 
 export default App;

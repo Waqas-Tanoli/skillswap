@@ -1,29 +1,33 @@
-import { Router } from "express";
+import express from "express";
 
-import * as AuthController from "../controllers/auth.controller";
-import { validate } from "../middleware/validate";
 import {
-  registerSchema,
-  loginSchema,
-} from "../validators/auth.validator";
-import { register } from "../controllers/auth.controller";
+  register,
+  login,
+  me,
+  logout,
+} from "../controllers/auth.controller";
 
-const router = Router();
+import { authMiddleware } from "../middleware/auth.middleware";
 
-router.post(
-  "/register",
-  validate(registerSchema),
-  AuthController.register
+const router = express.Router();
+
+router.post("/register", register);
+
+router.post("/login", login);
+
+router.get(
+  "/me",
+  authMiddleware,
+  me
 );
 
 router.post(
-  "/login",
-  validate(loginSchema),
-  AuthController.login
+  "/logout",
+  authMiddleware,
+  logout
 );
 
 export default router;
-
 /**
  * @openapi
  * /auth/register:

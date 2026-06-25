@@ -3,8 +3,7 @@ import jwt from "jsonwebtoken";
 
 interface DecodedToken {
   id: string;
-  role: string;
-  username: string;
+  email: string;
 }
 
 export interface AuthRequest extends Request {
@@ -17,29 +16,27 @@ export const authMiddleware = (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies.token;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!token) {
       return res.status(401).json({
         success: false,
-        message: "No token provided",
+        message: "Unauthorized",
       });
     }
 
-    const token = authHeader.split(" ")[1];
-
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET as string
+      process.env.JWT_SECRET!
     ) as DecodedToken;
 
     req.user = decoded;
 
     next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({
       success: false,
-      message: "Invalid or expired token",
+      message: "Invalid token",
     });
   }
 };
