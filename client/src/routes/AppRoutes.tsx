@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 
 import LoginPage from "../features/auth/pages/LoginPage";
 import RegisterPage from "../features/auth/pages/RegisterPage";
+import HomePage from "../features/home/pages/HomePage";
 
 // import DashboardPage from "../features/dashboard/pages/DashboardPage";
 // import ProfilePage from "../features/user/pages/ProfilePage";
@@ -18,6 +19,7 @@ export default function AppRoutes() {
       {/* AUTH */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/" element={<HomePage />} />
       
 
       {/* USER APP

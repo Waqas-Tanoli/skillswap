@@ -6,7 +6,6 @@ import {
   Mail,
   MapPin,
   Phone,
-  Heart,
 } from "lucide-react";
 
 export default function Footer() {
@@ -139,10 +138,6 @@ export default function Footer() {
           <p className="text-sm text-slate-400 flex items-center gap-1">
             © {currentYear} SkillSwap. All rights reserved.
             <span className="hidden sm:inline">•</span>
-            <span className="flex items-center gap-1">
-              Made with <Heart className="h-3 w-3 text-red-500 fill-red-500" /> around
-              the world
-            </span>
           </p>
 
           {/* Language & Region Selector */}
