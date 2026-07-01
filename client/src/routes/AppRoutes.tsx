@@ -13,6 +13,10 @@ import HomePage from "../features/home/pages/HomePage";
 
 import ProtectedRoute from "../components/ProtectedRoutes";
 import DashboardPage from "../features/dashboard/Pages/DashboardPage";
+import ProfilePage from "../features/user/Pages/ProfilePage";
+import MatchesPage from "../features/matches/Pages/MatchPage";
+import SwapsPage from "../features/swaps/Pages/SwapPage";
+import NotificationsPage from "../features/notifications/Pages/NotificationPage";
 
 export default function AppRoutes() {
   return (
@@ -29,6 +33,41 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <ProfilePage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/matches"
+  element={
+    <ProtectedRoute>
+      <MatchesPage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/swaps"
+  element={
+    <ProtectedRoute>
+      <SwapsPage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/notifications"
+  element={
+    <ProtectedRoute>
+      <NotificationsPage />
+    </ProtectedRoute>
+  }
+/>
 {/* 
       <Route
         path="/profile"
