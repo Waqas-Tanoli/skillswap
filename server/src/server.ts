@@ -18,6 +18,7 @@ import dashboardRoutes from "./routes/dashboard.route";
 import adminRoutes from "./routes/admin.route";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger";
+import { seedDatabase } from "./utils/seeds";
 
 
 const PORT = process.env.PORT || 5000;
@@ -43,8 +44,8 @@ initSocket(server);
 const startServer = async () => {
   try {
     await dbConnect();
-    await seedSkills();
-
+   await seedDatabase();
+   
     server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
