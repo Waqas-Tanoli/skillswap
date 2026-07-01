@@ -14,8 +14,7 @@ export default function DashboardLayout({ children }: Props) {
       <main className="flex-1 overflow-y-auto">
         {/* Content */}
         <div className="p-6 lg:p-8">
-         
-
+        
           {/* Children */}
           {children}
         </div>

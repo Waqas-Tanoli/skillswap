@@ -10,7 +10,7 @@ import userRoutes from "./routes/user.route";
 import swapRoutes from "./routes/swap.routes";
 import matchRoutes from "./routes/match.route";
 import skillRoutes from "./routes/skills.route";
-import {seedSkills} from "./utils/seedSkills";
+import {seedSkills} from "./utils/seeds/seedSkills";
 import chatRoutes from "./routes/chat.route";
 import ratingRoutes from "./routes/rating.route";
 import notificationRoutes from "./routes/notification.route"; 
