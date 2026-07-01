@@ -1,15 +1,27 @@
-export interface MatchUser {
+export type Skill = {
   _id: string;
   name: string;
-  email: string;
-  avatar?: string;
-  bio?: string;
-  trustScore?: number;
-}
+  category?: string;
+};
 
-export interface Match {
+export type UserSkill = {
+  _id: string;
+  skill: Skill;
+  level: "beginner" | "intermediate" | "advanced";
+};
+
+export type MatchUser = {
+  _id: string;
+  username: string;
+  email: string;
+  bio?: string;
+  location?: string;
+
+  skillsToTeach: UserSkill[];
+  skillsToLearn: UserSkill[];
+};
+
+export type Match = {
   user: MatchUser;
   score: number;
-  teachMatch: string[];
-  learnMatch: string[];
-}
+};
