@@ -15,5 +15,5 @@ export const registerUser = (
 export const getMe = () =>
   api.get("/auth/me");
 
-export const logout = () =>
+export const logoutUser = () =>
   api.post("/auth/logout");

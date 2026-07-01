@@ -17,7 +17,8 @@ import {
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const { user, logout } = useAuthStore((state) => state);
+  const user = useAuthStore((state) => state.user);
+const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
 
   // Close mobile menu on resize
@@ -43,8 +44,8 @@ export default function Header() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/login");
     setIsUserMenuOpen(false);
     setIsMenuOpen(false);
@@ -118,7 +119,7 @@ export default function Header() {
                       <p className="text-xs text-slate-500">{user.email}</p>
                     </div>
                     <Link
-                      to="/profile"
+                      to="/dashboard"
                       className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >

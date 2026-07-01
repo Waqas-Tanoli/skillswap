@@ -1,5 +1,8 @@
 import { create } from "zustand";
-import { getMe } from "../features/auth/api";
+import {
+  getMe,
+  logoutUser,
+} from "../features/auth/api";
 
 interface User {
   id: string;
@@ -13,37 +16,47 @@ interface AuthState {
   loading: boolean;
 
   setUser: (user: User | null) => void;
+
   initializeAuth: () => Promise<void>;
-  logout: () => void;
+
+  logout: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  loading: true,
+export const useAuthStore =
+  create<AuthState>((set) => ({
+    user: null,
+    loading: true,
 
-  setUser: (user) => set({ user }),
+    setUser: (user) =>
+      set({ user }),
 
-  initializeAuth: async () => {
-    try {
-      const res = await getMe();
+    initializeAuth: async () => {
+      try {
+        const res = await getMe();
 
-      set({
-        user: res.data.data,
-        loading: false,
-      });
-    } catch (error) {
-      console.error(error);
+        set({
+          user: res.data.data,
+          loading: false,
+        });
+      } catch (error) {
+        console.error(error);
 
-      set({
-        user: null,
-        loading: false,
-      });
-    }
-  },
+        set({
+          user: null,
+          loading: false,
+        });
+      }
+    },
 
-  logout: () => {
-    set({
-      user: null,
-    });
-  },
-}));
+    logout: async () => {
+      try {
+        await logoutUser();
+      } catch (error) {
+        console.error(error);
+      } finally {
+        set({
+          user: null,
+        });
+      }
+    },
+  }));
