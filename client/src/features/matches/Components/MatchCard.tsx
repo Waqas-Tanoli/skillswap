@@ -1,4 +1,9 @@
+import { useState } from "react";
+
+import SendSwapModal from "../../swaps/Components/SendSwapModal";
+
 import type { Match } from "../types";
+
 import MatchSkills from "./MatchSkills";
 
 type Props = {
@@ -8,6 +13,8 @@ type Props = {
 export default function MatchCard({
   match,
 }: Props) {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
       <div className="flex items-start justify-between">
@@ -50,9 +57,18 @@ export default function MatchCard({
         />
       </div>
 
-      <button className="mt-6 w-full rounded-xl bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700">
+      <button
+        onClick={() => setOpen(true)}
+        className="mt-6 w-full rounded-xl bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700"
+      >
         Send Swap Request
       </button>
+
+      <SendSwapModal
+        match={match}
+        open={open}
+        onClose={() => setOpen(false)}
+      />
     </div>
   );
 }
