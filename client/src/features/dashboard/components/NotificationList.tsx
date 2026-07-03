@@ -4,7 +4,7 @@ type Props = {
   notifications: Notification[];
 };
 
-export default function NotificationList({
+export default function   NotificationList({
   notifications,
 }: Props) {
   return (
@@ -26,7 +26,7 @@ export default function NotificationList({
             className="border-b pb-3"
           >
             <h3 className="font-semibold">
-              {notification.title}
+              {notification.title} 
             </h3>
 
             <p className="text-sm text-gray-600">

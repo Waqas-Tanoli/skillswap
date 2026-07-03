@@ -27,6 +27,7 @@ class AuthService {
     const token = generateToken({
       id: user._id.toString(),
       email: user.email,
+      username: user.username,
     });
 
     return {
@@ -61,6 +62,7 @@ class AuthService {
     const token = generateToken({
       id: user._id.toString(),
       email: user.email,
+      username: user.username,
     });
 
     return {

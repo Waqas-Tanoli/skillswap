@@ -13,7 +13,7 @@ export interface Reputation {
 
 export interface NotificationSender {
   _id: string;
-  name: string;
+  username: string;
   avatar?: string;
 }
 
@@ -28,7 +28,7 @@ export interface Notification {
 
 export interface DashboardUser {
   _id: string;
-  name: string;
+  username: string;
   email: string;
   avatar?: string;
   trustScore: number;

@@ -47,7 +47,7 @@ export const login = async (
 
     const result = await authService.login(
       email,
-      password
+      password,
     );
 
     res.cookie("token", result.token, {

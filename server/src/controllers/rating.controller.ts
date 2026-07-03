@@ -76,7 +76,7 @@ export const getUserRatings = async (
   const ratings = await Rating.find({
     ratedUser: userId,
   })
-    .populate("rater", "name avatar")
+    .populate("rater", "username avatar")
     .sort({ createdAt: -1 });
 
   return res.status(200).json({

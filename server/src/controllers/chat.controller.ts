@@ -10,8 +10,8 @@ export const getChatMessages = async (
   const messages = await Message.find({
     swap: swapId,
   })
-    .populate("sender", "name avatar")
-    .populate("receiver", "name avatar")
+    .populate("sender", "username avatar")
+    .populate("receiver", "username avatar")
     .sort({ createdAt: 1 });
 
   return res.status(200).json({

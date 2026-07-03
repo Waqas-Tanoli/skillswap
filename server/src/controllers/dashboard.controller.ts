@@ -14,7 +14,7 @@ export const getDashboard = async (
 
   const user = await User.findById(userId)
     .select(
-      "name email avatar trustScore skillsToTeach skillsToLearn"
+      "username email avatar trustScore skillsToTeach skillsToLearn"
     )
     .populate("skillsToTeach.skill", "name category")
     .populate("skillsToLearn.skill", "name category");
@@ -74,7 +74,7 @@ export const getDashboard = async (
     })
       .sort({ createdAt: -1 })
       .limit(5)
-      .populate("sender", "name avatar"),
+      .populate("sender", "username avatar"),
   ]);
 
   const averageRating =
