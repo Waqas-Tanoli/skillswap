@@ -29,7 +29,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/swaps", swapRoutes);
 app.use("/api/matches", matchRoutes);
 app.use("/api/skills", skillRoutes);
-app.use("/api/chats", chatRoutes);
+app.use("/api/chat", chatRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/dashboard", dashboardRoutes);

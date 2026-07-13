@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import {
   getMe,
   logoutUser,
@@ -9,13 +10,17 @@ interface User {
   username: string;
   email: string;
   role: "user" | "admin";
+  token?: string;
 }
 
 interface AuthState {
   user: User | null;
+
   loading: boolean;
 
-  setUser: (user: User | null) => void;
+  setUser: (
+    user: User | null
+  ) => void;
 
   initializeAuth: () => Promise<void>;
 
@@ -25,6 +30,7 @@ interface AuthState {
 export const useAuthStore =
   create<AuthState>((set) => ({
     user: null,
+
     loading: true,
 
     setUser: (user) =>
@@ -34,8 +40,24 @@ export const useAuthStore =
       try {
         const res = await getMe();
 
+        const apiUser =
+          res.data.data.user;
+
+        const user: User = {
+          id: apiUser._id,
+
+          username:
+            apiUser.username,
+
+          email:
+            apiUser.email,
+
+          role:
+            apiUser.role,
+        };
+
         set({
-          user: res.data.data,
+          user,
           loading: false,
         });
       } catch (error) {

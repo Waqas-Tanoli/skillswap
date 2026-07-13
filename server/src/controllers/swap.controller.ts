@@ -349,3 +349,42 @@ export const getUserSwaps = async (
     });
   }
 };
+
+//get swap by id
+export const getSwapById = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  const swap =
+    await swapRequest
+      .findById(req.params.id)
+      .populate(
+        "sender",
+        "username email avatar trustScore"
+      )
+      .populate(
+        "receiver",
+        "username email avatar trustScore"
+      )
+      .populate(
+        "skillOffered",
+        "name category"
+      )
+      .populate(
+        "skillRequested",
+        "name category"
+      );
+
+  if (!swap) {
+    return res.status(404).json({
+      success: false,
+      message:
+        "Swap not found",
+    });
+  }
+
+  return res.json({
+    success: true,
+    data: swap,
+  });
+};

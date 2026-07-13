@@ -17,6 +17,7 @@ import ProfilePage from "../features/user/Pages/ProfilePage";
 import MatchesPage from "../features/matches/Pages/MatchPage";
 import SwapsPage from "../features/swaps/Pages/SwapPage";
 import NotificationsPage from "../features/notifications/Pages/NotificationPage";
+import ChatPage from "../features/chat/Pages/ChatPage";
 
 export default function AppRoutes() {
   return (
@@ -68,43 +69,14 @@ export default function AppRoutes() {
     </ProtectedRoute>
   }
 />
-{/* 
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/swaps"
-        element={
-          <ProtectedRoute>
-            <SwapRequestsPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/chat/:swapId"
-        element={
-          <ProtectedRoute>
-            <ChatPage />
-          </ProtectedRoute>
-        }
-      /> */}
-
-      {/* ADMIN
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute role="admin">
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      /> */}
+<Route
+  path="/chat/:swapId"
+  element={
+    <ProtectedRoute>
+      <ChatPage />
+    </ProtectedRoute>
+  }
+/>
     </Routes>
   );
 }
