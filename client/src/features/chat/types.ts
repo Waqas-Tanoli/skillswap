@@ -17,3 +17,20 @@ export interface ChatMessage {
 
   createdAt: string;
 }
+export interface ChatPreview {
+  swapId: string;
+
+  lastMessage: string;
+
+  updatedAt: string;
+
+  unreadCount: number;
+
+  otherUser: {
+    _id: string;
+
+    username: string;
+
+    avatar: string;
+  };
+}

@@ -18,6 +18,7 @@ import MatchesPage from "../features/matches/Pages/MatchPage";
 import SwapsPage from "../features/swaps/Pages/SwapPage";
 import NotificationsPage from "../features/notifications/Pages/NotificationPage";
 import ChatPage from "../features/chat/Pages/ChatPage";
+import Inbox from "../features/chat/Pages/Inbox";
 
 export default function AppRoutes() {
   return (
@@ -76,6 +77,15 @@ export default function AppRoutes() {
       <ChatPage />
     </ProtectedRoute>
   }
+/>
+
+<Route
+path="/chat"
+element={
+  <ProtectedRoute>
+    <Inbox />
+  </ProtectedRoute>
+}
 />
     </Routes>
   );

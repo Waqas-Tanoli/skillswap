@@ -1,7 +1,7 @@
 
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
-import { getChatMessages } from "../controllers/chat.controller";
+import { getChatMessages, getMyChats } from "../controllers/chat.controller";
 import { getSwapById } from "../controllers/swap.controller";
 
 const router = Router();
@@ -19,5 +19,10 @@ router.get(
   authMiddleware,
   getSwapById
 );
-
+//GET ALL Chats for a user
+router.get(
+  "/",
+  authMiddleware,
+  getMyChats
+);
 export default router;

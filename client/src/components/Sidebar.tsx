@@ -1,4 +1,4 @@
-// components/Sidebar.tsx - Cleaner version with proper typing
+
 import { NavLink, useNavigate } from "react-router-dom";
 import { logoutUser } from "../features/auth/api";
 import { useAuthStore } from "../store/authStore";
@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Settings,
   HelpCircle,
+  MessageCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -48,6 +49,11 @@ const links = [
     path: "/notifications",
     icon: Bell,
   },
+  {
+    name: "Chat",
+    path: "/chat",
+    icon: MessageCircle,
+  }
 ];
 
 const bottomLinks = [

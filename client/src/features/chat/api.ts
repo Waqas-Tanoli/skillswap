@@ -19,3 +19,12 @@ export const getSwapById = async (
 
   return response.data.data;
 };
+
+export const getMyChats =
+  async () => {
+    const res = await api.get(
+      "/chat"
+    );
+
+    return res.data.data;
+  };
