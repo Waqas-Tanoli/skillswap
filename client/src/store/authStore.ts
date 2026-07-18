@@ -4,6 +4,7 @@ import {
   getMe,
   logoutUser,
 } from "../features/auth/api";
+import { useNotificationStore } from "./notificationStore";
 
 interface User {
   id: string;
@@ -76,9 +77,13 @@ export const useAuthStore =
       } catch (error) {
         console.error(error);
       } finally {
-        set({
-          user: null,
-        });
-      }
+  useNotificationStore
+    .getState()
+    .clearNotifications();
+
+  set({
+    user: null,
+  });
+}
     },
   }));
