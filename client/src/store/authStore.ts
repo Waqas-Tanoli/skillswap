@@ -41,7 +41,7 @@ export const useAuthStore =
         const res = await getMe();
 
         const apiUser =
-          res.data.data.user;
+          res.data.data;
 
         const user: User = {
           id: apiUser._id,
