@@ -10,7 +10,7 @@ export default function DashboardHeader({
   return (
     <div className="mb-8">
       <h1 className="text-4xl font-bold">
-        Welcome back, {user.name}
+        Welcome back, {user.username}
       </h1>
 
       <p className="mt-2 text-gray-500">

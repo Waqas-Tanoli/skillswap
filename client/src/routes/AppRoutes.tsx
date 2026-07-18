@@ -87,6 +87,7 @@ element={
   </ProtectedRoute>
 }
 />
+
     </Routes>
   );
 }
