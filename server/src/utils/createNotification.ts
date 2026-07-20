@@ -1,4 +1,5 @@
 import Notification from "../models/notification";
+import { getIO } from "../sockets/socket";
 
 interface CreateNotificationParams {
   recipient: string;
@@ -19,5 +20,15 @@ interface CreateNotificationParams {
 export const createNotification = async (
   data: CreateNotificationParams
 ) => {
-  return Notification.create(data);
+  const notification =
+    await Notification.create(data);
+
+  const io = getIO();
+
+  io.to(data.recipient).emit(
+    "new_notification",
+    notification
+  );
+
+  return notification;
 };

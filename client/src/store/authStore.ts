@@ -4,6 +4,7 @@ import {
   getMe,
   logoutUser,
 } from "../features/auth/api";
+
 import { useNotificationStore } from "./notificationStore";
 
 interface User {
@@ -11,7 +12,6 @@ interface User {
   username: string;
   email: string;
   role: "user" | "admin";
-  token?: string;
 }
 
 interface AuthState {
@@ -19,9 +19,7 @@ interface AuthState {
 
   loading: boolean;
 
-  setUser: (
-    user: User | null
-  ) => void;
+  setUser: (user: User | null) => void;
 
   initializeAuth: () => Promise<void>;
 
@@ -41,20 +39,13 @@ export const useAuthStore =
       try {
         const res = await getMe();
 
-        const apiUser =
-          res.data.data;
+        const apiUser = res.data.data;
 
         const user: User = {
           id: apiUser._id,
-
-          username:
-            apiUser.username,
-
-          email:
-            apiUser.email,
-
-          role:
-            apiUser.role,
+          username: apiUser.username,
+          email: apiUser.email,
+          role: apiUser.role,
         };
 
         set({
@@ -77,13 +68,14 @@ export const useAuthStore =
       } catch (error) {
         console.error(error);
       } finally {
-  useNotificationStore
-    .getState()
-    .clearNotifications();
+        useNotificationStore
+          .getState()
+          .clearNotifications();
 
-  set({
-    user: null,
-  });
-}
+        set({
+          user: null,
+          loading: false,
+        });
+      }
     },
   }));

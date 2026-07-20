@@ -11,7 +11,13 @@ interface JwtPayload {
   email: string;
   username: string;
 }
+let io: Server;
 
+export const setIO = (server: Server) => {
+  io = server;
+};
+
+export const getIO = () => io;
 export const initSocket = (server: http.Server) => {
   const io = new Server(server, {
     cors: {
@@ -19,7 +25,7 @@ export const initSocket = (server: http.Server) => {
       credentials: true,
     },
   });
-
+setIO(io);
   // Socket authentication
   io.use((socket, next) => {
     try {
@@ -56,6 +62,10 @@ export const initSocket = (server: http.Server) => {
   io.on("connection", (socket) => {
     const user = socket.data.user as JwtPayload;
 
+
+  socket.join(user.id);
+
+  console.log(`${user.id} connected`);
     console.log(
       `User connected: ${user.username} (${user.id})`
     );
