@@ -11,8 +11,8 @@ const router = Router();
 router.get("/me", authMiddleware, getMe);
 
 // Update user profile
-router.put(
-  "/update",
+router.patch(
+  "/me",
   authMiddleware,
   validate(updateProfileSchema),
   updateProfile

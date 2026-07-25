@@ -1,9 +1,13 @@
 import User from "../models/User";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { Response } from "express";
 
 // Get current user profile
-export const getMe = async (req: AuthRequest, res: any) => {
-  const user = await User.findById(req.user?.id).select("-password");
+export const getMe = async (req: AuthRequest, res: Response) => {
+  const user = await User.findById(req.user?.id)
+  .populate("skillsToTeach.skill", "name category")
+  .populate("skillsToLearn.skill", "name category")
+  .select("-password");
 
   return res.status(200).json({
     success: true,
@@ -13,16 +17,36 @@ export const getMe = async (req: AuthRequest, res: any) => {
 
 
 // Update user profile
-export const updateProfile = async (req: AuthRequest, res: any) => {
+export const updateProfile = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
+const {
+  username,
+  bio,
+  location,
+  avatar,
+  skillsToTeach,
+  skillsToLearn,
+} = req.body;
 
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    {
-      $set: req.body,
-    },
-    { new: true }
-  ).select("-password");
+const updatedUser = await User.findByIdAndUpdate(
+  userId,
+  {
+    username,
+    bio,
+    location,
+    avatar,
+    skillsToTeach,
+    skillsToLearn,
+  },
+  {
+    new: true,
+    runValidators: true,
+  }
+)
+.populate("skillsToTeach.skill", "name category")
+.populate("skillsToLearn.skill", "name category")
+.select("-password");
+  
 
   return res.status(200).json({
     success: true,
@@ -32,8 +56,11 @@ export const updateProfile = async (req: AuthRequest, res: any) => {
 };
 
 // Get user by ID (admin only) - Get Public user profile
-export const getUserById = async (req: any, res: any) => {
-  const user = await User.findById(req.params.id).select(
+export const getUserById = async (req: any, res: Response) => {
+  const user = await User.findById(req.params.id)
+  .populate("skillsToTeach.skill", "name category")
+  .populate("skillsToLearn.skill", "name category")
+  .select(
     "-password -email"
   );
 
@@ -52,23 +79,32 @@ export const getUserById = async (req: any, res: any) => {
 
 
 // Search users by skill or location
-export const searchUsers = async (req: any, res: any) => {
+export const searchUsers = async (
+  req: AuthRequest,
+  res: Response
+) => {
   const { skill, location } = req.query;
 
   const query: any = {};
 
   if (skill) {
     query.$or = [
-      { skillsToTeach: { $regex: skill, $options: "i" } },
-      { skillsToLearn: { $regex: skill, $options: "i" } },
+      { "skillsToTeach.skill": skill },
+      { "skillsToLearn.skill": skill },
     ];
   }
 
   if (location) {
-    query.location = { $regex: location, $options: "i" };
+    query.location = {
+      $regex: location,
+      $options: "i",
+    };
   }
 
-  const users = await User.find(query).select("-password");
+  const users = await User.find(query)
+    .populate("skillsToTeach.skill", "name category")
+    .populate("skillsToLearn.skill", "name category")
+    .select("-password");
 
   return res.status(200).json({
     success: true,
@@ -79,8 +115,14 @@ export const searchUsers = async (req: any, res: any) => {
 
 
 // Get all users (admin only)
-export const getAllUsers = async (req: any, res: any) => {
-  const users = await User.find().select("-password");
+export const getAllUsers = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  const users = await User.find()
+    .populate("skillsToTeach.skill", "name category")
+    .populate("skillsToLearn.skill", "name category")
+    .select("-password");
 
   return res.status(200).json({
     success: true,
