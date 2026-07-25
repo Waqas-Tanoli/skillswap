@@ -13,12 +13,14 @@ import HomePage from "../features/home/pages/HomePage";
 
 import ProtectedRoute from "../components/ProtectedRoutes";
 import DashboardPage from "../features/dashboard/Pages/DashboardPage";
-import ProfilePage from "../features/user/Pages/ProfilePage";
+import ProfilePage from "../features/profile/Pages/ProfilePage";
 import MatchesPage from "../features/matches/Pages/MatchPage";
 import SwapsPage from "../features/swaps/Pages/SwapPage";
 import NotificationsPage from "../features/notifications/Pages/NotificationPage";
 import ChatPage from "../features/chat/Pages/ChatPage";
 import Inbox from "../features/chat/Pages/Inbox";
+import EditProfilePage from "../features/profile/Pages/EditProfilePage";
+
 
 export default function AppRoutes() {
   return (
@@ -87,7 +89,15 @@ element={
   </ProtectedRoute>
 }
 />
+<Route
+  path="/profile"
+  element={<ProfilePage />}
+/>
 
+<Route
+  path="/profile/edit"
+  element={<EditProfilePage />}
+/>
     </Routes>
   );
 }
