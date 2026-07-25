@@ -63,7 +63,7 @@ export const updateSkill = async (req: any, res: any) => {
   const updated = await Skill.findByIdAndUpdate(
     req.params.id,
     req.body,
-    { new: true }
+    { returnDocument: "after" }
   );
 
   return res.status(200).json({

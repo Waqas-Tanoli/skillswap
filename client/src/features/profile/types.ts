@@ -5,7 +5,7 @@ export interface Skill {
 }
 
 export interface UserSkill {
-  skill: Skill;
+  skill: Skill | string;
   level: "beginner" | "intermediate" | "advanced";
 }
 

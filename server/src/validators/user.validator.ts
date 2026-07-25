@@ -14,6 +14,7 @@ export const updateProfileSchema = z.object({
   email: z.string().email().optional(),
   password: z.string().min(6).max(100).optional(),
   bio: z.string().max(500).optional(),
+  location: z.string().max(100).optional(),
    skillsToTeach: z.array(skillSchema).optional(),
   skillsToLearn: z.array(skillSchema).optional(),
   avatar: z.string().url().optional(),

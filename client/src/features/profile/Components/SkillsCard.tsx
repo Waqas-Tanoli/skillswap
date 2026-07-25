@@ -33,7 +33,7 @@ export default function SkillsCard({
         {skills.map((item) => (
 
           <div
-            key={item.skill._id}
+            key={item.skill instanceof Object ? item.skill._id : item.skill}
             className="flex items-center justify-between rounded-lg border p-3"
           >
 
@@ -41,13 +41,13 @@ export default function SkillsCard({
 
               <p className="font-medium">
 
-                {item.skill.name}
+                {item.skill instanceof Object ? item.skill.name : item.skill}
 
               </p>
 
               <p className="text-sm text-slate-500">
 
-                {item.skill.category}
+                {item.skill instanceof Object ? item.skill.category : "Category not available"}
 
               </p>
 

@@ -12,7 +12,7 @@ export const updateProfile = async (
   data: Partial<UserProfile>
 ) => {
   const res = await api.patch(
-    "/users/profile",
+    "users/me",
     data
   );
 

@@ -39,7 +39,7 @@ const updatedUser = await User.findByIdAndUpdate(
     skillsToLearn,
   },
   {
-    new: true,
+    returnDocument: "after",
     runValidators: true,
   }
 )

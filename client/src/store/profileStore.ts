@@ -8,6 +8,7 @@ import {
 import type {
   UserProfile,
 } from "../features/profile/types";
+import { toast } from "react-toastify";
 
 interface ProfileState {
   profile: UserProfile | null;
@@ -45,21 +46,39 @@ export const useProfileStore =
     },
 
     saveProfile: async (data) => {
-      set({
-        loading: true,
-      });
 
-      try {
+    set({
+        loading:true
+    });
+
+    try{
+
         const profile =
-          await updateProfile(data);
+            await updateProfile(data);
 
         set({
-          profile,
+            profile
         });
-      } finally {
+
+        toast.success(
+            "Profile updated successfully"
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        toast.error(
+            "Failed to update profile"
+        );
+
+    }finally{
+
         set({
-          loading: false,
+            loading:false
         });
-      }
-    },
+
+    }
+
+},
   }));
