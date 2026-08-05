@@ -9,6 +9,7 @@ export const skillSchema = z.object({
     "advanced",
   ]),
 });
+
 export const updateProfileSchema = z.object({
   username: z.string().min(3).max(20).optional(),
   email: z.string().email().optional(),
