@@ -362,7 +362,7 @@ pnpm dev
 
 ---
 
-# Featire Improvements Expected
+# Feature Improvements Expected
 
 * Cloudinary Image Uploads
 * OAuth (Google & GitHub)
