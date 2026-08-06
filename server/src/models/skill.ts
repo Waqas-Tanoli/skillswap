@@ -1,8 +1,15 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { ObjectId } from "mongoose";
 
 export interface ISkill extends Document {
   name: string;
   category: string;
+  status:
+        | "Approved"
+        | "Pending"
+        | "Rejected";
+
+    requestedBy?: ObjectId;
 }
 
 const SkillSchema = new Schema<ISkill>(
@@ -18,6 +25,16 @@ const SkillSchema = new Schema<ISkill>(
       type: String,
       required: true,
       trim: true,
+    },
+    status: { 
+      
+      type: String,
+      enum: ["Pending", "Accepted", "Rejected"],
+      default: "Pending",
+    },
+    requestedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   { timestamps: true }
