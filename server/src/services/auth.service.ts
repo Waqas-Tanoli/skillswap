@@ -28,6 +28,7 @@ class AuthService {
       id: user._id.toString(),
       email: user.email,
       username: user.username,
+      role: user.role,
     });
 
     return {
@@ -63,6 +64,7 @@ class AuthService {
       id: user._id.toString(),
       email: user.email,
       username: user.username,
+      role: user.role,
     });
 
     return {

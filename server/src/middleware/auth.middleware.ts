@@ -5,6 +5,7 @@ interface DecodedToken {
   id: string;
   email: string;
   username: string;
+  role: string;
 }
 
 export interface AuthRequest extends Request {

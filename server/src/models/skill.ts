@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { Types } from "mongoose";
 import { ObjectId } from "mongoose";
 
 export interface ISkill extends Document {
@@ -9,7 +10,7 @@ export interface ISkill extends Document {
         | "Pending"
         | "Rejected";
 
-    requestedBy?: ObjectId;
+    requestedBy?: Types.ObjectId;
 }
 
 const SkillSchema = new Schema<ISkill>(
@@ -29,7 +30,7 @@ const SkillSchema = new Schema<ISkill>(
     status: { 
       
       type: String,
-      enum: ["Pending", "Accepted", "Rejected"],
+      enum: ["Approved", "Pending", "Rejected"],
       default: "Pending",
     },
     requestedBy: {

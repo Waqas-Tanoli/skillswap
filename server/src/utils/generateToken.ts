@@ -6,6 +6,7 @@ export const generateToken = (user: IJwtPayload) => {
     id: user.id,
     email: user.email, 
     username: user.username,
+    role: user.role,
   };
 
   return jwt.sign(payload, process.env.JWT_SECRET || "default_secret", {

@@ -9,20 +9,44 @@ import {
   getSkillById,
   updateSkill,
   deleteSkill,
+  requestSkill,
+  approveSkill,
+  rejectSkill,
+  getPendingSkills,
 } from "../controllers/skills.controller";
 
 import {
+  approveSkillSchema,
   createSkillSchema,
+  rejectSkillSchema,
+  requestSkillSchema,
   updateSkillSchema,
 } from "../validators/skills.validator";
 
 const router = Router();
-
 // Get all skills
 router.get("/", getAllSkills);
+
+// Get pending skills (admin only)
+router.get(
+  "/pending",
+  authMiddleware,
+  authorizeRoles("admin"),
+  getPendingSkills
+);
+
+
+// Request a new skill
+router.post(
+  "/request",
+  authMiddleware,
+  validate(requestSkillSchema),
+  requestSkill
+);
+// Get single skill by ID
 router.get("/:id", getSkillById);
 
-
+// Create skill (admin only)
 router.post(
   "/",
   authMiddleware,
@@ -31,6 +55,7 @@ router.post(
   createSkill
 );
 
+// Update skill (admin only)
 router.put(
   "/:id",
   authMiddleware,
@@ -39,11 +64,30 @@ router.put(
   updateSkill
 );
 
+// Delete skill (admin only)
 router.delete(
   "/:id",
   authMiddleware,
   authorizeRoles("admin"),
   deleteSkill
+);
+
+// Approve skill request (admin only)
+router.patch(
+  "/:id/approve",
+  authMiddleware,
+  authorizeRoles("admin"),
+  validate(approveSkillSchema),
+  approveSkill
+);
+
+// Reject skill request (admin only)
+router.delete(
+  "/:id/reject",
+  authMiddleware,
+  authorizeRoles("admin"),
+  validate(rejectSkillSchema),
+  rejectSkill
 );
 
 export default router;
