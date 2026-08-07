@@ -1,0 +1,84 @@
+export interface DashboardStats {
+  users: {
+    total: number;
+    verified: number;
+    banned: number;
+  };
+
+  swaps: {
+    total: number;
+    pending: number;
+    accepted: number;
+    rejected: number;
+    completed: number;
+  };
+
+  skills: {
+    total: number;
+    pendingRequests: number;
+  };
+
+  ratings: {
+    total: number;
+    average: number;
+  };
+}
+
+export interface AdminUser {
+  _id: string;
+  username: string;
+  email: string;
+  avatar?: string;
+  role: "user" | "admin";
+  trustScore: number;
+  isVerified: boolean;
+  isBanned: boolean;
+  createdAt: string;
+}
+
+export interface SkillRequest {
+  _id: string;
+  name: string;
+  category: string;
+
+  status:
+    | "pending"
+    | "approved"
+    | "rejected";
+
+  requestedBy: {
+    _id: string;
+    username: string;
+    email: string;
+  };
+
+  createdAt: string;
+}
+
+export interface Skill {
+  _id: string;
+  name: string;
+  category: string;
+}
+
+export interface Swap {
+  _id: string;
+
+  requester: {
+    _id: string;
+    username: string;
+  };
+
+  receiver: {
+    _id: string;
+    username: string;
+  };
+
+  status:
+    | "pending"
+    | "accepted"
+    | "rejected"
+    | "completed";
+
+  createdAt: string;
+}
