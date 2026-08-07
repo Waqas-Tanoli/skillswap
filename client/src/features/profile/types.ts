@@ -36,3 +36,19 @@ export interface UserProfile {
 
   updatedAt: string;
 }
+export interface SkillRequest {
+  name: string;
+  category: string;
+}
+
+export type SkillCategory =
+  | "IT"
+  | "Design"
+  | "Business"
+  | "Marketing"
+  | "Music"
+  | "Language"
+  | "Lifestyle"
+  | "Education"
+  | "Photography"
+  | "Other";
