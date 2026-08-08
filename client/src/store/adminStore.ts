@@ -71,11 +71,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
-  banOrUnbanUser: async (id: string) => {
-    try {
-      await toggleBan(id);
+banOrUnbanUser: async (id: string) => {
+  try {
+    await toggleBan(id);
 
-      const updatedUsers = get().users.map((user) => {
+    const updatedUsers = get().users.map(
+      (user) => {
         if (user._id !== id) {
           return user;
         }
@@ -84,23 +85,26 @@ export const useAdminStore = create<AdminState>((set, get) => ({
           ...user,
           isBanned: !user.isBanned,
         };
-      });
+      }
+    );
 
-      set({
-        users: updatedUsers,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  },
+    set({
+      users: updatedUsers,
+    });
+  } catch (error) {
+    console.error(
+      "Failed to update user ban status:",
+      error
+    );
+
+    throw error;
+  }
+},
 
   removeSwap: async (id: string) => {
     try {
       await deleteSwap(id);
 
-      // No swap list exists yet.
-      // This will be updated in Phase 5
-      // when we implement Admin Swaps.
     } catch (error) {
       console.error(error);
     }
