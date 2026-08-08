@@ -1,9 +1,10 @@
-
 import api from "../../../services/api";
 import type {
   DashboardStats,
   AdminUser,
   AdminSkillRequest,
+  AdminSwap,
+  SwapStatus,
 } from "../types";
 
 export const getAnalytics = async (): Promise<DashboardStats> => {
@@ -26,18 +27,15 @@ export const toggleBan = async (id: string) => {
 
 export const deleteSwap = async (id: string) => {
   const res = await api.delete(`/admin/swap/${id}`);
-    return res.data;
+  return res.data;
 };
 
 //skill request apis
-export const getSkillRequests =
-  async (): Promise<AdminSkillRequest[]> => {
-    const res = await api.get(
-      "/skills/requests"
-    );
+export const getSkillRequests = async (): Promise<AdminSkillRequest[]> => {
+  const res = await api.get("/skills/requests");
 
-    return res.data.data;
-  };
+  return res.data.data;
+};
 
 export const approveSkillRequest = async (id: string) => {
   const res = await api.patch(`/skills/${id}/approve`);
@@ -45,10 +43,7 @@ export const approveSkillRequest = async (id: string) => {
   return res.data;
 };
 
-export const rejectSkillRequest = async (
-  id: string,
-  reason?: string
-) => {
+export const rejectSkillRequest = async (id: string, reason?: string) => {
   const res = await api.delete(`/skills/${id}/reject`, {
     data: {
       reason,
@@ -56,4 +51,39 @@ export const rejectSkillRequest = async (
   });
 
   return res.data;
+};
+
+// ===============================
+// Get all admin swaps
+// ===============================
+
+export const getAdminSwaps = async (
+  status?: SwapStatus,
+  search?: string,
+): Promise<AdminSwap[]> => {
+  const params: Record<string, string> = {};
+
+  if (status) {
+    params.status = status;
+  }
+
+  if (search?.trim()) {
+    params.search = search.trim();
+  }
+
+  const response = await api.get("/admin/swaps", {
+    params,
+  });
+
+  return response.data.data;
+};
+
+// ===============================
+// Delete swap
+// ===============================
+
+export const deleteAdminSwap = async (id: string) => {
+  const response = await api.delete(`/admin/swap/${id}`);
+
+  return response.data;
 };

@@ -22,6 +22,7 @@ import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
 import RoleRedirect from "./RoleRedirect";
 import UsersPage from "../features/admin/pages/UsersPage";
 import SkillRequestsPage from "../features/admin/pages/SkillRequestsPage";
+import AdminSwapsPage from "../features/admin/pages/AdminSwapsPage";
 
 export default function AppRoutes() {
   return (
@@ -145,16 +146,17 @@ export default function AppRoutes() {
           path="/admin/skill-requests"
           element={<SkillRequestsPage />}
         />
+        <Route
+          path="/admin/swaps"
+          element={<AdminSwapsPage />}
+        />
 {/*
         <Route
           path="/admin/skill-requests"
           element={<SkillRequestsPage />}
         />
 
-        <Route
-          path="/admin/swaps"
-          element={<AdminSwapsPage />}
-        />
+        
         */}
 
       </Route>

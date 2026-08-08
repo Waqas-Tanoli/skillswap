@@ -111,3 +111,39 @@ export interface AdminSkillRequest {
 
   updatedAt: string;
 }
+export type SwapStatus =
+  | "pending"
+  | "accepted"
+  | "rejected"
+  | "completed";
+
+export interface AdminSwapUser {
+  _id: string;
+  username: string;
+  email: string;
+  avatar?: string;
+  trustScore?: number;
+}
+
+export interface AdminSwapSkill {
+  _id: string;
+  name: string;
+  category: string;
+}
+
+export interface AdminSwap {
+  _id: string;
+
+  sender: AdminSwapUser;
+  receiver: AdminSwapUser;
+
+  skillOffered: AdminSwapSkill;
+  skillRequested: AdminSwapSkill;
+
+  message?: string;
+
+  status: SwapStatus;
+
+  createdAt: string;
+  updatedAt: string;
+}

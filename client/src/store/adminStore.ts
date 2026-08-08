@@ -8,12 +8,16 @@ import {
   getSkillRequests,
   approveSkillRequest,
   rejectSkillRequest,
+  getAdminSwaps,
+  deleteAdminSwap,
 } from "../features/admin/api/api";
 
 import type {
   DashboardStats,
   AdminUser,
   AdminSkillRequest,
+  AdminSwap,
+  SwapStatus,
 } from "../features/admin/types";
 
 interface AdminState {
@@ -31,6 +35,11 @@ interface AdminState {
 
   // Skill request loading
   skillRequestsLoading: boolean;
+  swaps: AdminSwap[];
+swapsLoading: boolean;
+swapsError: string | null;
+
+
 
   // Actions
   fetchAnalytics: () => Promise<void>;
@@ -46,6 +55,12 @@ interface AdminState {
   approveSkillRequest: (id: string) => Promise<void>;
 
   rejectSkillRequest: (id: string, reason: string) => Promise<void>;
+  fetchSwaps: (
+  status?: SwapStatus,
+  search?: string
+) => Promise<void>;
+
+removeSwap: (id: string) => Promise<void>;
 }
 
 export const useAdminStore = create<AdminState>((set) => ({
@@ -203,4 +218,61 @@ export const useAdminStore = create<AdminState>((set) => ({
       throw error;
     }
   },
+  swaps: [],
+swapsLoading: false,
+swapsError: null,
+
+fetchSwaps: async (
+  status,
+  search
+) => {
+  set({
+    swapsLoading: true,
+    swapsError: null,
+  });
+
+  try {
+    const swaps = await getAdminSwaps(
+      status,
+      search
+    );
+
+    set({
+      swaps,
+      swapsLoading: false,
+    });
+  } catch (error) {
+    console.error(
+      "Failed to fetch admin swaps:",
+      error
+    );
+
+    set({
+      swapsLoading: false,
+      swapsError:
+        "Failed to load swap requests.",
+    });
+
+    throw error;
+  }
+},
+
+removeSwap: async (id) => {
+  try {
+    await deleteAdminSwap(id);
+
+    set((state) => ({
+      swaps: state.swaps.filter(
+        (swap) => swap._id !== id
+      ),
+    }));
+  } catch (error) {
+    console.error(
+      "Failed to delete admin swap:",
+      error
+    );
+
+    throw error;
+  }
+},
 }));

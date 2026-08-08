@@ -35,7 +35,7 @@ const links = [
     icon: GraduationCap,
   },
   {
-    name: "Swaps",
+    name: "Swap Management",
     path: "/admin/swaps",
     icon: RefreshCw,
   },
