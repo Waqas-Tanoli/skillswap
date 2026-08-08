@@ -15,9 +15,7 @@ export const requestSkillSchema = z.object({
   name: z.string().min(2),
   category: z.string().min(2),
 });
-export const approveSkillSchema = z.object({
-  // No body needed for approval, just params
-});
+
 
 export const rejectSkillSchema = z.object({
   reason: z.string().optional(),
@@ -26,5 +24,4 @@ export const rejectSkillSchema = z.object({
 export const validateCreateSkill = validate(createSkillSchema);
 export const validateUpdateSkill = validate(updateSkillSchema);
 export const validateRequestSkill = validate(requestSkillSchema);
-export const validateApproveSkill = validate(approveSkillSchema);
 export const validateRejectSkill = validate(rejectSkillSchema); 

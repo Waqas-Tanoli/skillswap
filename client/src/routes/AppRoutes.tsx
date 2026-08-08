@@ -21,6 +21,7 @@ import Inbox from "../features/chat/Pages/Inbox";
 import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
 import RoleRedirect from "./RoleRedirect";
 import UsersPage from "../features/admin/pages/UsersPage";
+import SkillRequestsPage from "../features/admin/pages/SkillRequestsPage";
 
 export default function AppRoutes() {
   return (
@@ -139,12 +140,12 @@ export default function AppRoutes() {
           path="/admin/users"
           element={<UsersPage />}
         />
-{/*
-        <Route
-          path="/admin/skills"
-          element={<SkillsPage />}
-        />
 
+        <Route
+          path="/admin/skill-requests"
+          element={<SkillRequestsPage />}
+        />
+{/*
         <Route
           path="/admin/skill-requests"
           element={<SkillRequestsPage />}

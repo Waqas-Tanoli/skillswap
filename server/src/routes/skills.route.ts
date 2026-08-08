@@ -13,10 +13,10 @@ import {
   approveSkill,
   rejectSkill,
   getPendingSkills,
+  getSkills,
 } from "../controllers/skills.controller";
 
 import {
-  approveSkillSchema,
   createSkillSchema,
   rejectSkillSchema,
   requestSkillSchema,
@@ -24,70 +24,100 @@ import {
 } from "../validators/skills.validator";
 
 const router = Router();
-// Get all skills
-router.get("/", getAllSkills);
 
-// Get pending skills (admin only)
+// Get all skills
+router.get("/", getSkills);
+
+/**
+ * =========================================================
+ * ADMIN SKILL REQUEST ROUTES
+ * =========================================================
+ */
+
+// Get pending skill requests
+// Used by Admin Dashboard
+router.get(
+  "/requests",
+  authMiddleware,
+  authorizeRoles("admin"),
+  getPendingSkills,
+);
+
 router.get(
   "/pending",
   authMiddleware,
   authorizeRoles("admin"),
-  getPendingSkills
+  getPendingSkills,
 );
 
+/**
+ * =========================================================
+ * USER SKILL REQUEST
+ * =========================================================
+ */
 
 // Request a new skill
 router.post(
   "/request",
   authMiddleware,
   validate(requestSkillSchema),
-  requestSkill
+  requestSkill,
 );
-// Get single skill by ID
-router.get("/:id", getSkillById);
 
-// Create skill (admin only)
+/**
+ * =========================================================
+ * ADMIN SKILL CREATION
+ * =========================================================
+ */
+
+// Create skill manually
 router.post(
   "/",
   authMiddleware,
   authorizeRoles("admin"),
   validate(createSkillSchema),
-  createSkill
+  createSkill,
 );
 
-// Update skill (admin only)
-router.put(
-  "/:id",
-  authMiddleware,
-  authorizeRoles("admin"),
-  validate(updateSkillSchema),
-  updateSkill
-);
+/**
+ * =========================================================
+ * SKILL ACTIONS
+ * =========================================================
+ */
 
-// Delete skill (admin only)
-router.delete(
-  "/:id",
-  authMiddleware,
-  authorizeRoles("admin"),
-  deleteSkill
-);
-
-// Approve skill request (admin only)
+// Approve skill request
 router.patch(
   "/:id/approve",
   authMiddleware,
   authorizeRoles("admin"),
-  validate(approveSkillSchema),
-  approveSkill
+  approveSkill,
 );
 
-// Reject skill request (admin only)
+// Reject skill request
 router.delete(
   "/:id/reject",
   authMiddleware,
   authorizeRoles("admin"),
   validate(rejectSkillSchema),
-  rejectSkill
+  rejectSkill,
 );
+
+// Get skill by ID
+
+router.get("/:id", getSkillById);
+
+//ADMIN SKILL MANAGEMENT //
+
+// Update skill
+router.put(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("admin"),
+  validate(updateSkillSchema),
+  updateSkill,
+);
+
+// Delete skill
+router.delete("/:id", authMiddleware, authorizeRoles("admin"), deleteSkill);
 
 export default router;

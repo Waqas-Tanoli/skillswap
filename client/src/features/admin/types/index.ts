@@ -42,9 +42,9 @@ export interface SkillRequest {
   category: string;
 
   status:
-    | "pending"
-    | "approved"
-    | "rejected";
+    | "Pending"
+    | "Approved"
+    | "Rejected";
 
   requestedBy: {
     _id: string;
@@ -81,4 +81,33 @@ export interface Swap {
     | "completed";
 
   createdAt: string;
+}
+export interface AdminSkillRequest {
+  _id: string;
+
+  name: string;
+
+  category: string;
+
+  description?: string;
+
+  requestedBy:
+    | string
+    | {
+        _id: string;
+        username: string;
+        email?: string;
+        avatar?: string;
+      };
+
+  status:
+    | "Pending"
+    | "Approved"
+    | "Rejected";
+
+  rejectionReason?: string;
+
+  createdAt: string;
+
+  updatedAt: string;
 }

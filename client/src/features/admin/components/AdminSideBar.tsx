@@ -16,7 +16,7 @@ import { useState } from "react";
 const links = [
   {
     name: "Dashboard",
-    path: "/admin",
+    path: "/admin/dashboard",
     icon: LayoutDashboard,
   },
   {

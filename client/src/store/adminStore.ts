@@ -5,38 +5,68 @@ import {
   getUsers,
   toggleBan,
   deleteSwap,
+  getSkillRequests,
+  approveSkillRequest,
+  rejectSkillRequest,
 } from "../features/admin/api/api";
 
 import type {
   DashboardStats,
   AdminUser,
+  AdminSkillRequest,
 } from "../features/admin/types";
 
 interface AdminState {
-  loading: boolean;
-
+  // Analytics
   analytics: DashboardStats | null;
 
+  // Users
   users: AdminUser[];
 
+  // Skill requests
+  skillRequests: AdminSkillRequest[];
+
+  // General loading
+  loading: boolean;
+
+  // Skill request loading
+  skillRequestsLoading: boolean;
+
+  // Actions
   fetchAnalytics: () => Promise<void>;
 
   fetchUsers: () => Promise<void>;
 
   banOrUnbanUser: (id: string) => Promise<void>;
 
-  removeSwap: (id: string) => Promise<void>;
+  deleteSwap: (id: string) => Promise<void>;
+
+  fetchSkillRequests: () => Promise<void>;
+
+  approveSkillRequest: (id: string) => Promise<void>;
+
+  rejectSkillRequest: (id: string, reason: string) => Promise<void>;
 }
 
-export const useAdminStore = create<AdminState>((set, get) => ({
-  loading: false,
+export const useAdminStore = create<AdminState>((set) => ({
+  // Initial State
 
   analytics: null,
 
   users: [],
 
+  skillRequests: [],
+
+  loading: false,
+
+  skillRequestsLoading: false,
+
+  // Analytics
+
   fetchAnalytics: async () => {
-    set({ loading: true });
+    set({
+      loading: true,
+    });
 
     try {
       const analytics = await getAnalytics();
@@ -45,7 +75,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         analytics,
       });
     } catch (error) {
-      console.error(error);
+      console.error("Failed to fetch analytics:", error);
+
+      throw error;
     } finally {
       set({
         loading: false,
@@ -53,8 +85,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
+  // Users
+
   fetchUsers: async () => {
-    set({ loading: true });
+    set({
+      loading: true,
+    });
 
     try {
       const users = await getUsers();
@@ -63,7 +99,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         users,
       });
     } catch (error) {
-      console.error(error);
+      console.error("Failed to fetch users:", error);
+
+      throw error;
     } finally {
       set({
         loading: false,
@@ -71,42 +109,98 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
-banOrUnbanUser: async (id: string) => {
-  try {
-    await toggleBan(id);
+  // Ban / Unban
 
-    const updatedUsers = get().users.map(
-      (user) => {
-        if (user._id !== id) {
-          return user;
-        }
+  banOrUnbanUser: async (id: string) => {
+    try {
+      await toggleBan(id);
 
-        return {
-          ...user,
-          isBanned: !user.isBanned,
-        };
-      }
-    );
+      set((state) => ({
+        users: state.users.map((user) =>
+          user._id === id
+            ? {
+                ...user,
+                isBanned: !user.isBanned,
+              }
+            : user,
+        ),
+      }));
+    } catch (error) {
+      console.error("Failed to update user ban status:", error);
 
-    set({
-      users: updatedUsers,
-    });
-  } catch (error) {
-    console.error(
-      "Failed to update user ban status:",
-      error
-    );
+      throw error;
+    }
+  },
 
-    throw error;
-  }
-},
+  // Delete Swap
 
-  removeSwap: async (id: string) => {
+  deleteSwap: async (id: string) => {
     try {
       await deleteSwap(id);
-
     } catch (error) {
-      console.error(error);
+      console.error("Failed to delete swap:", error);
+
+      throw error;
+    }
+  },
+
+  // Skill Requests
+
+  fetchSkillRequests: async () => {
+    set({
+      skillRequestsLoading: true,
+    });
+
+    try {
+      const skillRequests = await getSkillRequests();
+
+      set({
+        skillRequests,
+      });
+    } catch (error) {
+      console.error("Failed to fetch skill requests:", error);
+
+      throw error;
+    } finally {
+      set({
+        skillRequestsLoading: false,
+      });
+    }
+  },
+
+  // Approve Skill Request
+
+  approveSkillRequest: async (id: string) => {
+    try {
+      await approveSkillRequest(id);
+
+      set((state) => ({
+        skillRequests: state.skillRequests.filter(
+          (request) => request._id !== id,
+        ),
+      }));
+    } catch (error) {
+      console.error("Failed to approve skill request:", error);
+
+      throw error;
+    }
+  },
+
+  // Reject Skill Request
+
+  rejectSkillRequest: async (id: string, reason: string) => {
+    try {
+      await rejectSkillRequest(id, reason);
+
+      set((state) => ({
+        skillRequests: state.skillRequests.filter(
+          (request) => request._id !== id,
+        ),
+      }));
+    } catch (error) {
+      console.error("Failed to reject skill request:", error);
+
+      throw error;
     }
   },
 }));
