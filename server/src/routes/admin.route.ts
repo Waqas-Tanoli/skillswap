@@ -4,6 +4,7 @@ import { authMiddleware } from "../middleware/auth.middleware";
 import { adminOnly } from "../middleware/admin.middleware";
 
 import {
+  getAllSwapsAdmin,
   getAllUsersAdmin,
   toggleBanUser,
 } from "../controllers/admin/user.admin.controller";
@@ -41,6 +42,17 @@ router.get(
   getPlatformAnalytics
 );
 
+
+// ===============================
+// Admin Swaps
+// ===============================
+
+router.get(
+  "/swaps",
+  authMiddleware,
+  adminOnly,
+  getAllSwapsAdmin
+);
 //Delete a swap request (admin only)
 router.delete(
   "/swap/:id",
@@ -48,5 +60,4 @@ router.delete(
   adminOnly,
   deleteSwap
 );
-
 export default router;
