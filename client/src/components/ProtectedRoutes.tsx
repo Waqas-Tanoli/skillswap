@@ -13,7 +13,6 @@ export default function ProtectedRoute({ children, role }: Props) {
   if (loading) return <div>Loading...</div>;
 
   if (!user) return <Navigate to="/login" />;
-
   if (role && user.role !== role) {
     return <Navigate to="/" />;
   }

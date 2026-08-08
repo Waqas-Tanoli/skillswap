@@ -52,7 +52,15 @@ export default function LoginPage() {
         autoClose: 3000,
       });
 
-      navigate("/");
+      if (user.role === "admin") {
+        navigate("/admin/dashboard", {
+          replace: true,
+        });
+      } else {
+        navigate("/dashboard", {
+          replace: true,
+        });
+      }
     } catch (error: unknown) {
       console.error(error);
 
@@ -137,7 +145,10 @@ export default function LoginPage() {
           {/* Features - Desktop */}
           <div className="hidden lg:block mt-12 space-y-4">
             {features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-3 text-slate-300">
+              <div
+                key={index}
+                className="flex items-center gap-3 text-slate-300"
+              >
                 <feature.icon className="h-5 w-5 text-blue-400 shrink-0" />
                 <span>{feature.text}</span>
               </div>
@@ -165,19 +176,18 @@ export default function LoginPage() {
 
         {/* Mobile Message */}
         <div className="lg:hidden relative z-10">
-          <h1 className="text-3xl font-bold text-white">
-            Welcome back
-          </h1>
-          <p className="mt-2 text-slate-300">
-            Continue your learning journey
-          </p>
+          <h1 className="text-3xl font-bold text-white">Welcome back</h1>
+          <p className="mt-2 text-slate-300">Continue your learning journey</p>
         </div>
 
         {/* Mobile Features */}
         <div className="lg:hidden relative z-10 mt-6">
           <div className="grid grid-cols-1 gap-2">
             {features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-2 text-sm text-slate-300">
+              <div
+                key={index}
+                className="flex items-center gap-2 text-sm text-slate-300"
+              >
                 <feature.icon className="h-4 w-4 text-blue-400 shrink-0" />
                 <span>{feature.text}</span>
               </div>
@@ -287,9 +297,7 @@ export default function LoginPage() {
 
             {/* Footer */}
             <div className="text-center text-sm">
-              <span className="text-slate-500">
-                Don't have an account?{" "}
-              </span>
+              <span className="text-slate-500">Don't have an account? </span>
               <Link
                 to="/register"
                 className="font-semibold text-slate-900 hover:text-blue-600 transition-colors"
