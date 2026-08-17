@@ -1,18 +1,8 @@
-type Skill = {
-  _id: string;
-  name: string;
-  category?: string;
-};
-
-type SkillItem = {
-  _id: string;
-  skill: Skill;
-  level: "beginner" | "intermediate" | "advanced";
-};
+import type { UserSkill } from "../types";
 
 type Props = {
   title: string;
-  skills: SkillItem[];
+  skills: UserSkill[];
 };
 
 export default function MatchSkills({
@@ -27,7 +17,7 @@ export default function MatchSkills({
         </h3>
 
         <p className="text-sm text-slate-500">
-          No skills available
+          No overlapping skills
         </p>
       </div>
     );

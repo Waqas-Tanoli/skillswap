@@ -19,9 +19,17 @@ export default function MatchCard({
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">
-            {match.user.username}
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-slate-900">
+              {match.user.username}
+            </h2>
+
+            {match.isMutualMatch && (
+              <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700">
+                Mutual Match
+              </span>
+            )}
+          </div>
 
           <p className="text-slate-500">
             {match.user.email}
@@ -35,7 +43,7 @@ export default function MatchCard({
         </div>
 
         <div className="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
-          Match Score: {match.score}%
+          {match.matchPercentage}% Match
         </div>
       </div>
 
@@ -47,13 +55,13 @@ export default function MatchCard({
 
       <div className="mt-6 space-y-6">
         <MatchSkills
-          title="Can Teach You"
-          skills={match.user.skillsToTeach}
+          title="They Can Teach You"
+          skills={match.teachMatch}
         />
 
         <MatchSkills
-          title="Wants To Learn"
-          skills={match.user.skillsToLearn}
+          title="They Want To Learn From You"
+          skills={match.learnMatch}
         />
       </div>
 

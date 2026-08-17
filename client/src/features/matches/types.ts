@@ -24,4 +24,8 @@ export type MatchUser = {
 export type Match = {
   user: MatchUser;
   score: number;
+  matchPercentage: number;
+  isMutualMatch: boolean;
+  teachMatch: UserSkill[]; 
+  learnMatch: UserSkill[]; 
 };
