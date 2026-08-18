@@ -1,15 +1,24 @@
-import {z} from "zod";
-import {validate} from "../middleware/validate";
-
+import { z } from "zod";
+import { validate } from "../middleware/validate";
 
 export const createRatingSchema = z.object({
-  from: z.string().uuid(),
-  to: z.string().uuid(),
-  swapRequest: z.string().uuid(),
-  rating: z.number().min(1).max(5),
-  review: z.string().max(1000).optional(),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
+  swapId: z.string().min(1, "Swap ID is required"),
+
+  ratedUser: z.string().min(1, "Rated user is required"),
+
+  rating: z
+    .number()
+    .int("Rating must be a whole number")
+    .min(1, "Rating must be at least 1")
+    .max(5, "Rating cannot exceed 5"),
+
+  review: z
+    .string()
+    .max(1000, "Review cannot exceed 1000 characters")
+    .optional()
+    .or(z.literal("")),
 });
 
-export const validateCreateRating = validate(createRatingSchema);
+export const validateCreateRating = validate(
+  createRatingSchema
+);

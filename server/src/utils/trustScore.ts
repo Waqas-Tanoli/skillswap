@@ -2,23 +2,80 @@ import Rating from "../models/rating";
 import SwapRequest from "../models/swapRequest";
 import User from "../models/User";
 
-export const updateTrustScore = async (userId: string) => {
-  const ratings = await Rating.find({ ratedUser: userId });
-
-  const avgRating =
-    ratings.reduce((acc, r) => acc + r.rating, 0) /
-    (ratings.length || 1);
-
-  const completedSwaps = await SwapRequest.countDocuments({
-    $or: [{ sender: userId }, { receiver: userId }],
-    status: "completed",
+export const updateTrustScore = async (
+  userId: string
+) => {
+  /**
+   * Get all ratings received by user.
+   */
+  const ratings = await Rating.find({
+    ratedUser: userId,
   });
 
-  const trustScore = Math.round(
-    avgRating * 20 + completedSwaps * 2
+  /**
+   * Calculate average rating.
+   */
+  const totalRating = ratings.reduce(
+    (sum, rating) =>
+      sum + rating.rating,
+    0
   );
 
-  await User.findByIdAndUpdate(userId, {
-    trustScore,
-  });
+  const averageRating =
+    ratings.length > 0
+      ? totalRating / ratings.length
+      : 0;
+
+  /**
+   * Count completed swaps.
+   */
+  const completedSwaps =
+    await SwapRequest.countDocuments({
+      $or: [
+        { sender: userId },
+        { receiver: userId },
+      ],
+
+      status: "completed",
+    });
+
+  /**
+   * Rating component.
+   *
+   * 5 stars = 100 points.
+   */
+  const ratingScore =
+    averageRating * 20;
+
+  /**
+   * Experience component.
+   */
+  const experienceScore =
+    completedSwaps * 2;
+
+  /**
+   * Final trust score.
+   */
+  const calculatedScore =
+    ratingScore + experienceScore;
+
+  /**
+   * Keep score between 0 and 100.
+   */
+  const trustScore = Math.min(
+    100,
+    Math.round(calculatedScore)
+  );
+
+  await User.findByIdAndUpdate(
+    userId,
+    {
+      trustScore,
+    },
+    {
+      new: true,
+    }
+  );
+
+  return trustScore;
 };
