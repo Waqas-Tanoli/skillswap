@@ -200,8 +200,8 @@ export const createRating = async (
  * Get all ratings for a user
  */
 export const getUserRatings = async (
-  req: AuthRequest,
-  res: Response
+  req: any,
+  res: any
 ) => {
   try {
     const { userId } = req.params;
@@ -215,27 +215,74 @@ export const getUserRatings = async (
       )
       .populate(
         "swap",
-        "skillOffered skillRequested status"
+        "status skillOffered skillRequested"
+      )
+      .populate(
+        "swap.skillOffered",
+        "name category"
+      )
+      .populate(
+        "swap.skillRequested",
+        "name category"
       )
       .sort({
         createdAt: -1,
       });
 
+    const totalRatings = ratings.length;
+
+    const totalScore = ratings.reduce(
+      (sum, rating) =>
+        sum + rating.rating,
+      0
+    );
+
+    const averageRating =
+      totalRatings > 0
+        ? Number(
+            (totalScore / totalRatings).toFixed(1)
+          )
+        : 0;
+
+    const distribution = {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+    };
+
+    ratings.forEach((rating) => {
+      distribution[
+        rating.rating as 1 | 2 | 3 | 4 | 5
+      ]++;
+    });
+
     return res.status(200).json({
       success: true,
-      count: ratings.length,
+
+      count: totalRatings,
+
       data: ratings,
+
+      summary: {
+        averageRating,
+
+        totalRatings,
+
+        distribution,
+      },
     });
   } catch (error) {
     console.error(
-      "Get user ratings error:",
+      "Failed to fetch user ratings:",
       error
     );
 
     return res.status(500).json({
       success: false,
-      message:
-        "Failed to fetch user ratings",
+
+      message: "Failed to fetch ratings",
     });
   }
 };
