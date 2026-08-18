@@ -38,3 +38,13 @@ export const getUserRatings = async (
 
   return response.data;
 };
+
+export const getUserRatingSummary = async (
+  userId: string
+): Promise<UserRatingsResponse> => {
+  const response = await api.get(
+    `/ratings/${userId}/summary`
+  );
+
+  return response.data;
+} 

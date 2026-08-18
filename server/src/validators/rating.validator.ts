@@ -3,9 +3,7 @@ import { validate } from "../middleware/validate";
 
 export const createRatingSchema = z.object({
   swapId: z.string().min(1, "Swap ID is required"),
-
-  ratedUser: z.string().min(1, "Rated user is required"),
-
+    ratedUser: z.string().min(1),
   rating: z
     .number()
     .int("Rating must be a whole number")

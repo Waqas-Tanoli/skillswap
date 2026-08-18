@@ -4,6 +4,7 @@ import { authMiddleware } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate";
 
 import {
+  canRateSwap,
   createRating,
   getUserRatings,
   getUserRatingSummary,
@@ -34,6 +35,13 @@ router.get(
   "/:userId",
   authMiddleware,
   getUserRatings
+);
+
+// Check if current user can rate a swap
+router.get(
+  "/can-rate/:swapId",
+  authMiddleware,
+  canRateSwap
 );
 
 export default router;

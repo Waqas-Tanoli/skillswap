@@ -1,4 +1,5 @@
 import { Response } from "express";
+import mongoose from "mongoose";
 
 import Rating from "../models/rating";
 import SwapRequest from "../models/swapRequest";
@@ -9,9 +10,25 @@ import { updateTrustScore } from "../utils/trustScore";
 import { createNotification } from "../utils/createNotification";
 
 /**
+ * Helper to extract string from req.params
+ */
+const getParamAsString = (param: string | string[]): string => {
+  return Array.isArray(param) ? param[0] : param;
+};
+
+/**
  * Create Rating
  *
- * Only participants of a completed swap can rate each other.
+ * Rules:
+ * - User must be authenticated.
+ * - Swap must exist.
+ * - Swap must be completed.
+ * - User must be a participant.
+ * - User cannot rate themselves.
+ * - ratedUser must be the other participant.
+ * - User can only rate a swap once.
+ * - Rating must be between 1 and 5.
+ * - Review cannot exceed 1000 characters.
  */
 export const createRating = async (
   req: AuthRequest,
@@ -27,6 +44,10 @@ export const createRating = async (
       review,
     } = req.body;
 
+    // -----------------------------------------
+    // Authentication
+    // -----------------------------------------
+
     if (!raterId) {
       return res.status(401).json({
         success: false,
@@ -34,20 +55,103 @@ export const createRating = async (
       });
     }
 
-    // Prevent self-rating
-    if (raterId === ratedUser) {
+    // -----------------------------------------
+    // Required fields
+    // -----------------------------------------
+
+    if (!swapId || !ratedUser || rating === undefined) {
       return res.status(400).json({
         success: false,
-        message: "You cannot rate yourself",
+        message:
+          "swapId, ratedUser and rating are required",
       });
     }
 
-    /**
-     * Find swap
-     */
-    const swap = await SwapRequest.findById(
-      swapId
-    );
+    // -----------------------------------------
+    // Validate MongoDB IDs
+    // -----------------------------------------
+
+    if (
+      !mongoose.Types.ObjectId.isValid(swapId)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid swap ID",
+      });
+    }
+
+    if (
+      !mongoose.Types.ObjectId.isValid(
+        ratedUser
+      )
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid rated user ID",
+      });
+    }
+
+    // -----------------------------------------
+    // Validate rating
+    // -----------------------------------------
+
+    if (
+      typeof rating !== "number" ||
+      !Number.isInteger(rating) ||
+      rating < 1 ||
+      rating > 5
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Rating must be an integer between 1 and 5",
+      });
+    }
+
+    // -----------------------------------------
+    // Validate review
+    // -----------------------------------------
+
+    if (
+      review !== undefined &&
+      review !== null &&
+      typeof review !== "string"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Review must be a string",
+      });
+    }
+
+    if (
+      typeof review === "string" &&
+      review.length > 1000
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Review cannot exceed 1000 characters",
+      });
+    }
+
+    // -----------------------------------------
+    // Prevent self-rating
+    // -----------------------------------------
+
+    if (raterId === ratedUser) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "You cannot rate yourself",
+      });
+    }
+
+    // -----------------------------------------
+    // Find swap
+    // -----------------------------------------
+
+    const swap =
+      await SwapRequest.findById(swapId);
 
     if (!swap) {
       return res.status(404).json({
@@ -56,9 +160,10 @@ export const createRating = async (
       });
     }
 
-    /**
-     * Only completed swaps can be rated.
-     */
+    // -----------------------------------------
+    // Only completed swaps can be rated
+    // -----------------------------------------
+
     if (swap.status !== "completed") {
       return res.status(400).json({
         success: false,
@@ -67,15 +172,17 @@ export const createRating = async (
       });
     }
 
-    /**
-     * Make sure the current user
-     * participated in this swap.
-     */
-    const isParticipant =
-      swap.sender.toString() === raterId ||
+    // -----------------------------------------
+    // Check rater is a participant
+    // -----------------------------------------
+
+    const isSender =
+      swap.sender.toString() === raterId;
+
+    const isReceiver =
       swap.receiver.toString() === raterId;
 
-    if (!isParticipant) {
+    if (!isSender && !isReceiver) {
       return res.status(403).json({
         success: false,
         message:
@@ -83,29 +190,17 @@ export const createRating = async (
       });
     }
 
-    /**
-     * The person being rated must be
-     * the other participant.
-     */
-    const isRatedUserParticipant =
-      swap.sender.toString() === ratedUser ||
-      swap.receiver.toString() === ratedUser;
+    // -----------------------------------------
+    // Determine the other participant
+    // -----------------------------------------
 
-    if (!isRatedUserParticipant) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "The rated user is not part of this swap",
-      });
-    }
+    const otherParticipant = isSender
+      ? swap.receiver.toString()
+      : swap.sender.toString();
 
-    /**
-     * Make sure user is rating the OTHER participant.
-     */
-    const otherParticipant =
-      swap.sender.toString() === raterId
-        ? swap.receiver.toString()
-        : swap.sender.toString();
+    // -----------------------------------------
+    // Make sure ratedUser is the other user
+    // -----------------------------------------
 
     if (otherParticipant !== ratedUser) {
       return res.status(400).json({
@@ -115,28 +210,14 @@ export const createRating = async (
       });
     }
 
-    /**
-     * Prevent duplicate rating.
-     */
-    const existing = await Rating.findOne({
-      swap: swapId,
-      rater: raterId,
-    });
+    // -----------------------------------------
+    // Verify rated user exists
+    // -----------------------------------------
 
-    if (existing) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "You already rated this swap",
-      });
-    }
-
-    /**
-     * Verify rated user exists.
-     */
-    const user = await User.findById(
-      ratedUser
-    );
+    const user =
+      await User.findById(ratedUser).select(
+        "_id username"
+      );
 
     if (!user) {
       return res.status(404).json({
@@ -145,48 +226,99 @@ export const createRating = async (
       });
     }
 
-    /**
-     * Create rating.
-     */
-    const newRating = await Rating.create({
-      swap: swapId,
-      rater: raterId,
-      ratedUser,
-      rating,
-      review: review ?? "",
-    });
+    // -----------------------------------------
+    // Prevent duplicate rating
+    // -----------------------------------------
 
-    /**
-     * Recalculate trust score.
-     */
+    const existingRating =
+      await Rating.findOne({
+        swap: swapId,
+        rater: raterId,
+      });
+
+    if (existingRating) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "You already rated this swap",
+      });
+    }
+
+    // -----------------------------------------
+    // Create rating
+    // -----------------------------------------
+
+    const newRating =
+      await Rating.create({
+        swap: swapId,
+        rater: raterId,
+        ratedUser,
+        rating,
+        review:
+          typeof review === "string"
+            ? review.trim()
+            : "",
+      });
+
+    // -----------------------------------------
+    // Update trust score
+    // -----------------------------------------
+
     await updateTrustScore(ratedUser);
 
-    /**
-     * Notify rated user.
-     */
-    await createNotification({
-      recipient: ratedUser,
-      sender: raterId,
+    // -----------------------------------------
+    // Notify rated user
+    // -----------------------------------------
 
-      type: "rating",
+    try {
+      await createNotification({
+        recipient: ratedUser,
+        sender: raterId,
 
-      title: "New Review",
+        type: "rating",
 
-      message:
-        "You received a new review from a completed skill swap.",
-    });
+        title: "New Review",
+
+        message:
+          "You received a new review from a completed skill swap.",
+      });
+    } catch (notificationError) {
+      /**
+       * Do not fail the rating request
+       * if notification creation fails.
+       */
+      console.error(
+        "Rating notification error:",
+        notificationError
+      );
+    }
+
+    // -----------------------------------------
+    // Response
+    // -----------------------------------------
 
     return res.status(201).json({
       success: true,
+
       message:
         "Rating submitted successfully",
+
       data: newRating,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(
       "Create rating error:",
       error
     );
+
+    // Duplicate index protection
+    if (error?.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "You already rated this swap",
+      });
+    }
 
     return res.status(500).json({
       success: false,
@@ -198,65 +330,130 @@ export const createRating = async (
 
 /**
  * Get all ratings for a user
+ *
+ * GET /ratings/:userId
  */
 export const getUserRatings = async (
-  req: any,
-  res: any
+  req: AuthRequest,
+  res: Response
 ) => {
   try {
     const { userId } = req.params;
+    const userIdStr = getParamAsString(userId);
 
-    const ratings = await Rating.find({
-      ratedUser: userId,
-    })
-      .populate(
-        "rater",
-        "username avatar"
-      )
-      .populate(
-        "swap",
-        "status skillOffered skillRequested"
-      )
-      .populate(
-        "swap.skillOffered",
-        "name category"
-      )
-      .populate(
-        "swap.skillRequested",
-        "name category"
-      )
-      .sort({
-        createdAt: -1,
+    // -----------------------------------------
+    // Validate user ID
+    // -----------------------------------------
+
+    if (
+      !mongoose.Types.ObjectId.isValid(userIdStr)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid user ID",
       });
+    }
 
-    const totalRatings = ratings.length;
+    // -----------------------------------------
+    // Verify user exists
+    // -----------------------------------------
 
-    const totalScore = ratings.reduce(
-      (sum, rating) =>
-        sum + rating.rating,
-      0
-    );
+    const user =
+      await User.findById(userIdStr).select(
+        "_id username avatar trustScore"
+      );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // -----------------------------------------
+    // Get ratings
+    // -----------------------------------------
+
+    const ratings =
+      await Rating.find({
+        ratedUser: userIdStr,
+      })
+        .populate(
+          "rater",
+          "username avatar"
+        )
+        .populate(
+          "swap",
+          "status skillOffered skillRequested"
+        )
+        .populate(
+          "swap.skillOffered",
+          "name category"
+        )
+        .populate(
+          "swap.skillRequested",
+          "name category"
+        )
+        .sort({
+          createdAt: -1,
+        });
+
+    // -----------------------------------------
+    // Calculate summary
+    // -----------------------------------------
+
+    const totalRatings =
+      ratings.length;
+
+    const totalScore =
+      ratings.reduce(
+        (sum, rating) =>
+          sum + rating.rating,
+        0
+      );
 
     const averageRating =
       totalRatings > 0
         ? Number(
-            (totalScore / totalRatings).toFixed(1)
+            (
+              totalScore /
+              totalRatings
+            ).toFixed(1)
           )
         : 0;
 
+    // -----------------------------------------
+    // Rating distribution
+    // -----------------------------------------
+
     const distribution = {
-      1: 0,
-      2: 0,
-      3: 0,
-      4: 0,
       5: 0,
+      4: 0,
+      3: 0,
+      2: 0,
+      1: 0,
     };
 
     ratings.forEach((rating) => {
-      distribution[
-        rating.rating as 1 | 2 | 3 | 4 | 5
-      ]++;
+      if (
+        rating.rating >= 1 &&
+        rating.rating <= 5
+      ) {
+        distribution[
+          rating.rating as
+            | 1
+            | 2
+            | 3
+            | 4
+            | 5
+        ]++;
+      }
     });
+
+    // -----------------------------------------
+    // Response
+    // -----------------------------------------
 
     return res.status(200).json({
       success: true,
@@ -267,28 +464,28 @@ export const getUserRatings = async (
 
       summary: {
         averageRating,
-
         totalRatings,
-
         distribution,
       },
     });
   } catch (error) {
     console.error(
-      "Failed to fetch user ratings:",
+      "Get user ratings error:",
       error
     );
 
     return res.status(500).json({
       success: false,
-
-      message: "Failed to fetch ratings",
+      message:
+        "Failed to fetch ratings",
     });
   }
 };
 
 /**
  * Get rating summary for a user
+ *
+ * GET /ratings/:userId/summary
  */
 export const getUserRatingSummary = async (
   req: AuthRequest,
@@ -296,56 +493,118 @@ export const getUserRatingSummary = async (
 ) => {
   try {
     const { userId } = req.params;
+    const userIdStr = getParamAsString(userId);
 
-    const ratings = await Rating.find({
-      ratedUser: userId,
-    }).select("rating");
+    // -----------------------------------------
+    // Validate ID
+    // -----------------------------------------
 
-    const totalRatings = ratings.length;
+    if (
+      !mongoose.Types.ObjectId.isValid(userIdStr)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid user ID",
+      });
+    }
 
-    const totalStars = ratings.reduce(
-      (sum, rating) =>
-        sum + rating.rating,
-      0
-    );
+    // -----------------------------------------
+    // Verify user exists
+    // -----------------------------------------
+
+    const user =
+      await User.findById(userIdStr).select(
+        "_id username avatar trustScore"
+      );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // -----------------------------------------
+    // Get ratings
+    // -----------------------------------------
+
+    const ratings =
+      await Rating.find({
+        ratedUser: userIdStr,
+      }).select("rating");
+
+    // -----------------------------------------
+    // Calculate average
+    // -----------------------------------------
+
+    const totalRatings =
+      ratings.length;
+
+    const totalStars =
+      ratings.reduce(
+        (sum, rating) =>
+          sum + rating.rating,
+        0
+      );
 
     const averageRating =
       totalRatings > 0
         ? Number(
-            (totalStars / totalRatings).toFixed(
-              1
-            )
+            (
+              totalStars /
+              totalRatings
+            ).toFixed(1)
           )
         : 0;
 
+    // -----------------------------------------
+    // Distribution
+    // -----------------------------------------
+
     const ratingDistribution = {
-      5: ratings.filter(
-        (r) => r.rating === 5
-      ).length,
-
-      4: ratings.filter(
-        (r) => r.rating === 4
-      ).length,
-
-      3: ratings.filter(
-        (r) => r.rating === 3
-      ).length,
-
-      2: ratings.filter(
-        (r) => r.rating === 2
-      ).length,
-
-      1: ratings.filter(
-        (r) => r.rating === 1
-      ).length,
+      5: 0,
+      4: 0,
+      3: 0,
+      2: 0,
+      1: 0,
     };
+
+    ratings.forEach((rating) => {
+      if (
+        rating.rating >= 1 &&
+        rating.rating <= 5
+      ) {
+        ratingDistribution[
+          rating.rating as
+            | 1
+            | 2
+            | 3
+            | 4
+            | 5
+        ]++;
+      }
+    });
+
+    // -----------------------------------------
+    // Response
+    // -----------------------------------------
 
     return res.status(200).json({
       success: true,
 
       data: {
+        user: {
+          id: user._id,
+          username: user.username,
+          avatar: user.avatar,
+          trustScore: user.trustScore,
+        },
+
         totalRatings,
+
         averageRating,
+
         ratingDistribution,
       },
     });
@@ -359,6 +618,150 @@ export const getUserRatingSummary = async (
       success: false,
       message:
         "Failed to fetch rating summary",
+    });
+  }
+};
+
+/**
+ * Check whether the authenticated user
+ * can rate a particular swap.
+ *
+ * GET /ratings/can-rate/:swapId
+ */
+export const canRateSwap = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const raterId = req.user?.id;
+    const { swapId } = req.params;
+    const swapIdStr = getParamAsString(swapId);
+
+    if (!raterId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    // -----------------------------------------
+    // Validate swap ID
+    // -----------------------------------------
+
+    if (
+      !mongoose.Types.ObjectId.isValid(swapIdStr)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid swap ID",
+      });
+    }
+
+    // -----------------------------------------
+    // Find swap
+    // -----------------------------------------
+
+    const swap =
+      await SwapRequest.findById(swapIdStr);
+
+    if (!swap) {
+      return res.status(404).json({
+        success: false,
+        message: "Swap not found",
+      });
+    }
+
+    // -----------------------------------------
+    // Check participation
+    // -----------------------------------------
+
+    const isSender =
+      swap.sender.toString() === raterId;
+
+    const isReceiver =
+      swap.receiver.toString() === raterId;
+
+    if (!isSender && !isReceiver) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          canRate: false,
+          reason:
+            "You are not a participant of this swap",
+        },
+      });
+    }
+
+    // -----------------------------------------
+    // Check completion
+    // -----------------------------------------
+
+    if (swap.status !== "completed") {
+      return res.status(200).json({
+        success: true,
+        data: {
+          canRate: false,
+          reason:
+            "Only completed swaps can be rated",
+        },
+      });
+    }
+
+    // -----------------------------------------
+    // Determine other participant
+    // -----------------------------------------
+
+    const ratedUser = isSender
+      ? swap.receiver.toString()
+      : swap.sender.toString();
+
+    // -----------------------------------------
+    // Check existing rating
+    // -----------------------------------------
+
+    const existingRating =
+      await Rating.findOne({
+        swap: swapIdStr,
+        rater: raterId,
+      });
+
+    if (existingRating) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          canRate: false,
+          alreadyRated: true,
+          ratedUser,
+          reason:
+            "You already rated this swap",
+        },
+      });
+    }
+
+    // -----------------------------------------
+    // User can rate
+    // -----------------------------------------
+
+    return res.status(200).json({
+      success: true,
+
+      data: {
+        canRate: true,
+        alreadyRated: false,
+        ratedUser,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Can rate swap error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Failed to check rating eligibility",
     });
   }
 };

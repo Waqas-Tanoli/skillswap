@@ -39,9 +39,7 @@ export interface Rating {
 
 export interface CreateRatingPayload {
   swapId: string;
-
-  ratedUser: string;
-
+ratedUser: string;
   rating: number;
 
   review?: string;
@@ -72,3 +70,10 @@ export interface UserRatingsResponse {
 
   summary?: RatingSummary;
 }
+
+
+export interface RatingsResponse {
+  success: boolean;
+  count: number;
+  data: Rating[];
+}   
