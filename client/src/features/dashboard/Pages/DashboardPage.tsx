@@ -1,7 +1,7 @@
 import DashboardHeader from "../components/DashboardHeader";
 import StatCard from "../components/StatCard";
 import ReputationCard from "../components/ReputationCard";
-import NotificationList from "../components/NotificationList";
+//import NotificationList from "../components/NotificationList";
 import DashboardLayout from "../../../layouts/DashboardLayout";
 import { useDashboard } from "../hooks";
 
@@ -59,11 +59,11 @@ export default function DashboardPage() {
         reputation={data.reputation}
       />
 
-      <NotificationList
+      {/* <NotificationList
         notifications={
           data.recentNotifications
         }
-      />
+      /> */}
     </div>
   </DashboardLayout>
 );
