@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document,Types } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IUserSkill {
   skill: Types.ObjectId;
@@ -13,9 +13,11 @@ export interface IUser extends Document {
   location?: string;
   avatar?: string;
 
-  skillsToTeach:IUserSkill[];
-  skillsToLearn:IUserSkill[];
+  skillsToTeach: IUserSkill[];
+  skillsToLearn: IUserSkill[];
   trustScore: number;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
 
   role: "user" | "admin";
 
@@ -28,7 +30,7 @@ export interface IUser extends Document {
 
 const userSchema = new Schema<IUser>(
   {
-    username  : {
+    username: {
       type: String,
       required: true,
       trim: true,
@@ -63,40 +65,49 @@ const userSchema = new Schema<IUser>(
     },
 
     skillsToTeach: [
-  {
-    skill: {
-      type: Schema.Types.ObjectId,
-      ref: "Skill",
-      required: true,
-    },
+      {
+        skill: {
+          type: Schema.Types.ObjectId,
+          ref: "Skill",
+          required: true,
+        },
 
-    level: {
-      type: String,
-      enum: ["beginner", "intermediate", "advanced"],
-      required: true,
-    },
-  },
-],
+        level: {
+          type: String,
+          enum: ["beginner", "intermediate", "advanced"],
+          required: true,
+        },
+      },
+    ],
 
-  skillsToLearn: [
-  {
-    skill: {
-      type: Schema.Types.ObjectId,
-      ref: "Skill",
-      required: true,
-    },
+    skillsToLearn: [
+      {
+        skill: {
+          type: Schema.Types.ObjectId,
+          ref: "Skill",
+          required: true,
+        },
 
-    level: {
-      type: String,
-      enum: ["beginner", "intermediate", "advanced"],
-      required: true,
-    },
-  },
-],
+        level: {
+          type: String,
+          enum: ["beginner", "intermediate", "advanced"],
+          required: true,
+        },
+      },
+    ],
 
     trustScore: {
       type: Number,
       default: 0,
+    },
+    resetPasswordToken: {
+      type: String,
+      default: null,
+    },
+
+    resetPasswordExpires: {
+      type: Date,
+      default: null,
     },
 
     role: {
@@ -117,7 +128,7 @@ const userSchema = new Schema<IUser>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-  export default mongoose.model<IUser>("User", userSchema);
+export default mongoose.model<IUser>("User", userSchema);

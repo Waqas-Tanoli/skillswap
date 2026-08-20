@@ -8,6 +8,12 @@ import {
 } from "../controllers/auth.controller";
 
 import { authMiddleware } from "../middleware/auth.middleware";
+import {
+  forgotPassword,
+  resetPassword,
+} from "../controllers/auth.controller";
+import { validate } from "../middleware/validate";
+import { forgotPasswordSchema, resetPasswordSchema } from "../validators/auth.validator";
 
 const router = express.Router();
 
@@ -25,6 +31,18 @@ router.post(
   "/logout",
   authMiddleware,
   logout
+);
+
+router.post(
+  "/forgot-password",
+  validate(forgotPasswordSchema),
+  forgotPassword
+);
+
+router.post(
+  "/reset-password/:token",
+  validate(resetPasswordSchema),
+  resetPassword
 );
 
 export default router;
