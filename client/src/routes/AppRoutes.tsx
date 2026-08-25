@@ -23,6 +23,8 @@ import RoleRedirect from "./RoleRedirect";
 import UsersPage from "../features/admin/pages/UsersPage";
 import SkillRequestsPage from "../features/admin/pages/SkillRequestsPage";
 import AdminSwapsPage from "../features/admin/pages/AdminSwapsPage";
+import ForgotPasswordPage from "../features/auth/pages/ForgotPasswordPage";
+import ResetPasswordPage from "../features/auth/pages/ResetPasswordPage";
 
 export default function AppRoutes() {
   return (
@@ -123,7 +125,15 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+<Route
+  path="/forgot-password"
+  element={<ForgotPasswordPage />}
+/>
 
+<Route
+  path="/reset-password/:token"
+  element={<ResetPasswordPage />}
+/>
     
       {/* ADMIN ROUTES */}
      
